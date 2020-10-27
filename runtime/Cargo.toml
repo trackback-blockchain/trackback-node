@@ -194,6 +194,7 @@ std = [
     'sp-transaction-pool/std',
     'sp-version/std',
     'template/std',
+    'trackback-pallet/std',
 ]
 
 [build-dependencies.wasm-builder-runner]
@@ -201,3 +202,9 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'substrate-wasm-builder-runner'
 tag = 'v2.0.0-rc6'
 version = '1.0.5'
+
+[dependencies.trackback-pallet]
+default-features = false
+package = 'trackback-pallet'
+path = '../../trackback-pallet'
+version = '2.0.0-rc6'
