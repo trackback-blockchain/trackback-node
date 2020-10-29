@@ -206,5 +206,5 @@ version = '1.0.5'
 [dependencies.trackback-pallet]
 default-features = false
 package = 'trackback-pallet'
-path = '../../trackback-pallet'
+path = '../pallets/trackback'
 version = '2.0.0-rc6'
