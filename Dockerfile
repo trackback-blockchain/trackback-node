@@ -1,7 +1,7 @@
 # Based from https://github.com/paritytech/substrate/blob/master/.maintain/Dockerfile
 
 FROM phusion/baseimage:0.10.2 as builder
-LABEL description="This is the build stage for Acala Node. Here we create the binary."
+LABEL description="This is the build stage for TANZ Node. Here we create the binary."
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -49,4 +49,4 @@ RUN mkdir /tanz/data
 
 VOLUME ["/tanz/data"]
 
-ENTRYPOINT ["/usr/local/bin/node-template"]
+CMD ["/usr/local/bin/node-template", "--dev", "--ws-external"]
