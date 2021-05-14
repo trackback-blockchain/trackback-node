@@ -173,3 +173,43 @@ by appending your own. A few useful ones are as follow.
 # Check whether the code is compilable
 ./scripts/docker_run.sh cargo check
 ```
+
+
+# Local deployment
+
+```bash
+# Purge any chain data from previous runs
+# You will be prompted to type `y`
+./target/release/node-template purge-chain --base-path /tmp/alice --chain local
+```
+
+```bash
+# Start Alice's node
+./target/release/node-template \
+  --base-path /tmp/alice \
+  --chain local \
+  --alice \
+  --port 30333 \
+  --ws-port 9944 \
+  --rpc-port 9933 \
+  --node-key 0000000000000000000000000000000000000000000000000000000000000001 \
+  --telemetry-url 'wss://telemetry.polkadot.io/submit/ 0' \
+  --validator
+```
+Starts Bob's node
+```bash
+./target/release/node-template purge-chain --base-path /tmp/bob --chain local
+```
+
+```bash
+./target/release/node-template \
+  --base-path /tmp/bob \
+  --chain local \
+  --bob \
+  --port 30334 \
+  --ws-port 9946 \
+  --rpc-port 9934 \
+  --telemetry-url 'wss://telemetry.polkadot.io/submit/ 0' \
+  --validator \
+  --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+```
