@@ -1,0 +1,9 @@
+binop_separator = "Front"
+blank_lines_lower_bound = 1
+brace_style = "SameLineWhere"
+edition = "2018"
+format_code_in_doc_comments = true
+imports_granularity = "Preserve" 
+imports_layout = "Mixed"
+indent_style = "Block"
+match_arm_leading_pipes = "Always"
