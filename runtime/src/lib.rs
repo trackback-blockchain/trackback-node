@@ -42,6 +42,8 @@ use pallet_transaction_payment::CurrencyAdapter;
 /// Import the template pallet.
 pub use pallet_trackback;
 
+pub use pallet_dids;
+
 /// An index to a block.
 pub type BlockNumber = u32;
 
@@ -265,6 +267,10 @@ impl pallet_trackback::Config for Runtime {
 }
 
 
+impl pallet_dids::Config for Runtime {
+	type Event = Event;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -282,6 +288,7 @@ construct_runtime!(
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		// Include the custom logic from the template pallet in the runtime.
 		TrackbackModule: pallet_trackback::{Module, Call, Storage, Event<T>},
+		DIDModule: pallet_dids::{Module, Call, Storage, Event<T>},
 	}
 );
 

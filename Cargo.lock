@@ -3631,6 +3631,7 @@ dependencies = [
  "hex-literal",
  "pallet-aura",
  "pallet-balances",
+ "pallet-dids",
  "pallet-grandpa",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
@@ -3857,6 +3858,20 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "serde",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-dids"
+version = "3.0.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
  "sp-runtime",
  "sp-std",
 ]

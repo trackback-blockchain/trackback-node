@@ -24,6 +24,7 @@ version = '2.0.0'
 hex-literal = { optional = true, version = '0.3.1' }
 serde = { features = ['derive'], optional = true, version = '1.0.119' }
 pallet-trackback = { path = '../pallets/trackback', default-features = false, version = '3.0.0' }
+pallet-dids = { path = '../pallets/dids', default-features = false, version = '3.0.0' }
 
 # Substrate dependencies
 frame-benchmarking = { default-features = false, optional = true, version = '3.0.0' }
@@ -72,6 +73,7 @@ std = [
     'frame-system-rpc-runtime-api/std',
     'pallet-aura/std',
     'pallet-balances/std',
+    'pallet-dids/std',
     'pallet-grandpa/std',
     'pallet-randomness-collective-flip/std',
     'pallet-sudo/std',
