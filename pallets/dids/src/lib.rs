@@ -1,6 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-// Making the pallet available for other palllets
+mod did_operations;
+mod utils;
+mod IPFSDriver;
+
+// Making the pallet available for other pallets
 pub use pallet::*;
 
 #[frame_support::pallet]
