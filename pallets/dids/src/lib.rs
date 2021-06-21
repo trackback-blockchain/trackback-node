@@ -48,11 +48,15 @@ pub mod pallet {
         #[pallet::weight(0)]
         pub fn create_proof(origin: OriginFor<T>, proof: Vec<u8>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
-
+            debug::info!(
+                "Request sent by: {:?} and the proof {:?}",
+                sender, proof
+            );
             ensure!(!Proofs::<T>::contains_key(&proof), Error::<T>::ProofExists);
 
             let current_block = <frame_system::Module<T>>::block_number();
-
+            // Key -> Append AccountId + DID Document Hash, Value -> DID Document hash
+            //
             Proofs::<T>::insert(&proof, (&sender, current_block));
 
             Self::deposit_event(Event::ProofCreated(sender, proof));
