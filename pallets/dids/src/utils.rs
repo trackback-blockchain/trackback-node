@@ -1,10 +1,7 @@
 /// Utility methods to support DID files
 
-pub trait CheckAuthorisation {
-}
+pub trait CheckAuthorisation {}
 
-pub trait CheckAuthentication {
-}
+pub trait CheckAuthentication {}
 
-pub trait CheckExpiry {
-}
+pub trait CheckExpiry {}

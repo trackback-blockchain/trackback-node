@@ -3870,6 +3870,8 @@ version = "3.0.0"
 dependencies = [
  "frame-support",
  "frame-system",
+ "log",
+ "pallet-timestamp",
  "parity-scale-codec",
  "serde",
  "sp-core",
