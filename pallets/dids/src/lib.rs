@@ -143,7 +143,7 @@ pub mod pallet {
                 (did_hash.clone()),
                 (time, did_document, block_number, &origin_account)
             );
-            Self::deposit_event(Event::DIDDocumentCreated(did_hash, &origin_account));
+            Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
             Ok(().into())
 
         }
