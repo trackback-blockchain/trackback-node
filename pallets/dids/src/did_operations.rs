@@ -14,8 +14,10 @@ use sp_runtime::RuntimeDebug;
 /// Associate account
 /// <Key, Value>
 #[derive(Encode, Debug, Decode, Default, Clone, PartialEq)]
-pub struct DIDAnchor {}
+pub struct DIDDocument{}
 
-pub trait ValidateDID {}
+#[derive(Encode, Debug, Decode, Default, Clone, PartialEq)]
+pub struct DIDController{}
 
-pub trait DeleteDID {}
+#[derive(Encode, Debug, Decode, Default, Clone, PartialEq)]
+pub struct DIDIssuer{}

@@ -4,7 +4,6 @@ mod did_operations;
 mod ipfs_driver;
 mod utils;
 
-// Making the pallet available for other pallets
 pub use pallet::*;
 
 
@@ -26,6 +25,13 @@ pub mod pallet {
     use sp_std::vec::Vec;
     use codec::EncodeLike;
 
+    pub struct DID {
+        did_uri: Vec<u8>,
+        did_document: Vec<u8>,
+        did_ref: Vec<u8>,
+
+    }
+
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_timestamp::Config  + {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
@@ -40,9 +46,7 @@ pub mod pallet {
     pub(super) type DIDs<T: Config> =
         StorageMap<
             _,
-
             Blake2_128Concat, Vec<u8>,
-
             (T::AccountId, T::BlockNumber),
             ValueQuery
         >;
@@ -55,11 +59,7 @@ pub mod pallet {
     #[pallet::getter(fn get_did_document)]
     pub(super) type DIDDocument<T: Config> = StorageMap<
         _,
-
-        // Blake2_128Concat, (T::AccountId, Vec<u8>),
         Blake2_128Concat, (Vec<u8>),
-
-
         (T::Moment,Vec<u8>, T::BlockNumber, T::AccountId),
         ValueQuery
     >;
@@ -79,30 +79,46 @@ pub mod pallet {
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         DIDCreated(T::AccountId, Vec<u8>),
-        // Event returns DID Document hash, DID URI, Sender's AccountId
-        DIDDocumentCreated(Vec<u8>, T::AccountId)
+        /// Event returns DID Document hash, DID URI, Sender's AccountId
+        DIDDocumentCreated(Vec<u8>, T::AccountId),
+
+        /// DID Document revoked
+        DIDDocumentRevoked(Vec<u8>, T::AccountId)
     }
 
     #[pallet::error]
     pub enum Error<T> {
+        /// DID Document exists
         DIDExists,
+
+        /// DID Document does not exists
+        DIDDoesNotExists,
+
+        /// Disputed DID Document
+        DIDDispute,
+
+        /// DID Document locked
+        DIDLocked,
     }
+
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 
         fn offchain_worker(block_number: T::BlockNumber) {
             log::info!("Hello World from offchain workers!");
             log::info!("{:?}", block_number);
-            let request = oc::http::Request::get(
-                "https://api.github.com/repos/octocat/hello-world/stats/commit_activity",
-            );
         }
     }
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::weight(0)]
-        pub fn revoke_did(origin: OriginFor<T>, did_key: Vec<u8>) -> DispatchResultWithPostInfo {
+        pub fn revoke_did(origin: OriginFor<T>, did_hash: Vec<u8>) -> DispatchResultWithPostInfo {
+            let origin_account = ensure_signed(origin)?;
+            ensure!(DIDDocument::<T>::contains_key(&did_hash), Error::<T>::DIDDoesNotExists);
+
+            DIDDocument::<T>::remove(&did_hash);
+            Self::deposit_event(Event::DIDDocumentRevoked(did_hash, origin_account));
             Ok(().into())
         }
 
@@ -120,25 +136,12 @@ pub mod pallet {
             did_hash: Vec<u8>,
         ) -> DispatchResultWithPostInfo {
             let origin_account = ensure_signed(origin)?;
-            // (T::Moment,Vec<u8>, T::BlockNumber, T::AccountId),
-
-            let did_doc_hash = Blake2_256::hash(&did_document);
 
             let block_number = <frame_system::Module<T>>::block_number();
             let time = <pallet_timestamp::Module<T>>::get();
 
+            ensure!(!DIDDocument::<T>::contains_key(&did_hash), Error::<T>::DIDExists);
 
-            // let acc = Self::get_did_document((origin_account.clone(), did_hash.clone()));
-            // ensure!(!DIDDocument::<T>::contains_key(
-            //     &(origin_account.clone(), did_hash.clone())
-            // ), Error::<T>::DIDExists);
-
-            // DO NOT PANIC!
-            let did_str = match str::from_utf8(&*did_document) {
-                | Ok(v) => v,
-                | Err(e) => "",
-            };
-            // (T::Moment,Vec<u8>, T::BlockNumber, T::AccountId),
             DIDDocument::<T>::insert(
                 (did_hash.clone()),
                 (time, did_document, block_number, &origin_account)
@@ -146,38 +149,6 @@ pub mod pallet {
             Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
             Ok(().into())
 
-        }
-
-        #[pallet::weight(0)]
-        pub fn create_did(
-            origin: OriginFor<T>,
-            mut did_doc: Vec<u8>,
-        ) -> DispatchResultWithPostInfo {
-            // T::AccountId
-            let sender = ensure_signed(origin)?;
-
-            let did_str = match str::from_utf8(&*did_doc) {
-                | Ok(v) => v,
-                | Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-
-            };
-            //
-            // debug::info!(
-            //     "Request sent by: {:?} \n \
-            //     and the proof {:?} \n\
-            //     and the DID document {:?}",
-            //     sender,
-            //     did_doc,
-            //     did_str
-            // );
-            ensure!(!DIDs::<T>::contains_key(&did_doc), Error::<T>::DIDExists);
-
-            let current_block = <frame_system::Module<T>>::block_number();
-
-            DIDs::<T>::insert(&did_doc, (&sender, current_block));
-
-            Self::deposit_event(Event::DIDCreated(sender, did_doc));
-            Ok(().into())
         }
     }
 }
