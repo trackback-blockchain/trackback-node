@@ -2,6 +2,7 @@ use sc_cli::RunCmd;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
+
 pub struct Cli {
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
@@ -11,6 +12,7 @@ pub struct Cli {
 }
 
 #[derive(Debug, StructOpt)]
+
 pub enum Subcommand {
     /// Key management cli utilities
     Key(sc_cli::KeySubcommand),
