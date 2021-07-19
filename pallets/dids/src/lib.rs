@@ -11,18 +11,12 @@ pub mod pallet {
 
     use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 
-    
-
     use frame_system::{
-        offchain::{
-            AppCrypto, CreateSignedTransaction, SendSignedTransaction, SendUnsignedTransaction,
-            SignedPayload, Signer, SigningTypes, SubmitTransaction,
-        },
+        offchain,
         pallet_prelude::*,
-        Account,
     };
 
-    
+
     use sp_std::str;
     use sp_std::vec::Vec;
     #[allow(dead_code)]
@@ -123,7 +117,6 @@ pub mod pallet {
 
         #[pallet::weight(0)]
         pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
-            todo!();
             Ok(().into())
         }
 
