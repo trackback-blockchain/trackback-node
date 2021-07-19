@@ -1,5 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
+/// Decentralised Pallet Implementation TrackBack Limited
 mod did_operations;
 mod ipfs_driver;
 mod utils;
@@ -34,11 +34,6 @@ pub mod pallet {
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T>(_);
 
-    #[pallet::storage]
-    #[pallet::getter(fn dids)]
-    pub(super) type DIDs<T: Config> =
-        StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
-
     /// Stores a DID document on chain
     /// Key 1 -> AccountId + DIDDocumentHash
     /// Key 2 -> Chain time
@@ -53,6 +48,7 @@ pub mod pallet {
         ValueQuery,
     >;
 
+    /// Accounts associated with a DID
     #[pallet::storage]
     #[pallet::getter(fn get_did_accounts)]
     pub(super) type DIDAccount<T: Config> =
@@ -85,6 +81,7 @@ pub mod pallet {
         DIDLocked,
     }
 
+    /// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
         fn offchain_worker(block_number: T::BlockNumber) {
@@ -97,6 +94,8 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
 
+        /// DID Revocation
+        /// Throws DoesNotExists for a non existing DID revocation
         #[pallet::weight(0)]
         pub fn revoke_did(origin: OriginFor<T>, did_hash: Vec<u8>) -> DispatchResultWithPostInfo {
 
@@ -114,6 +113,7 @@ pub mod pallet {
             Ok(().into())
         }
 
+        /// Updates a DID document
         #[pallet::weight(0)]
         pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
             Ok(().into())
