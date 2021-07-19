@@ -13,13 +13,10 @@ use sp_runtime::RuntimeDebug;
 /// Associate account
 /// <Key, Value>
 #[derive(Encode, Debug, Decode, Default, Clone, PartialEq)]
-
 pub struct DIDDocument {}
 
 #[derive(Encode, Debug, Decode, Default, Clone, PartialEq)]
-
 pub struct DIDController {}
 
 #[derive(Encode, Debug, Decode, Default, Clone, PartialEq)]
-
 pub struct DIDIssuer {}
