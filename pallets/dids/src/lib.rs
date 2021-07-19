@@ -12,7 +12,6 @@ pub mod pallet {
     use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 
     use frame_system::{
-        offchain,
         pallet_prelude::*,
     };
 
