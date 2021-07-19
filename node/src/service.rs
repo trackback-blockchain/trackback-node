@@ -54,7 +54,6 @@ pub fn new_partial(
 > {
 
     if config.keystore_remote.is_some() {
-
         return Err(ServiceError::Other(format!(
             "Remote Keystores are not supported."
         )));
@@ -113,7 +112,6 @@ pub fn new_partial(
 }
 
 fn remote_keystore(_url: &String) -> Result<Arc<LocalKeystore>, &'static str> {
-
     // FIXME: here would the concrete keystore be built,
     //        must return a concrete type (NOT `LocalKeystore`) that
     //        implements `CryptoStore` and `SyncCryptoStore`
@@ -137,10 +135,9 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
     } = new_partial(&config)?;
 
     if let Some(url) = &config.keystore_remote {
-
         match remote_keystore(url) {
-            | Ok(k) => keystore_container.set_remote_keystore(k),
-            | Err(e) => {
+            Ok(k) => keystore_container.set_remote_keystore(k),
+            Err(e) => {
                 return Err(ServiceError::Other(format!(
                     "Error hooking up remote keystore for {}: {}",
                     url, e
@@ -166,7 +163,6 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
         })?;
 
     if config.offchain_worker.enabled {
-
         sc_service::build_offchain_workers(
             &config,
             backend.clone(),
@@ -177,25 +173,17 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
     }
 
     let role = config.role.clone();
-
     let force_authoring = config.force_authoring;
-
     let backoff_authoring_blocks: Option<()> = None;
-
     let name = config.network.node_name.clone();
-
     let enable_grandpa = !config.disable_grandpa;
-
     let prometheus_registry = config.prometheus_registry().cloned();
 
     let rpc_extensions_builder = {
-
         let client = client.clone();
-
         let pool = transaction_pool.clone();
 
         Box::new(move |deny_unsafe, _| {
-
             let deps = crate::rpc::FullDeps {
                 client: client.clone(),
                 pool: pool.clone(),
@@ -223,7 +211,6 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
         })?;
 
     if role.is_authority() {
-
         let proposer = sc_basic_authorship::ProposerFactory::new(
             task_manager.spawn_handle(),
             client.clone(),
@@ -258,10 +245,8 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
     // if the node isn't actively participating in consensus then it doesn't
     // need a keystore, regardless of which protocol we use below.
     let keystore = if role.is_authority() {
-
         Some(keystore_container.sync_keystore())
     } else {
-
         None
     };
 
@@ -276,7 +261,6 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
     };
 
     if enable_grandpa {
-
         // start the full GRANDPA voter
         // NOTE: non-authorities could run the GRANDPA observer protocol, but at
         // this point the full voter should provide better guarantees of block
@@ -302,14 +286,12 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
     }
 
     network_starter.start_network();
-
     Ok(task_manager)
 }
 
 /// Builds a new service for a light client.
 
 pub fn new_light(mut config: Configuration) -> Result<TaskManager, ServiceError> {
-
     let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
@@ -362,7 +344,6 @@ pub fn new_light(mut config: Configuration) -> Result<TaskManager, ServiceError>
         })?;
 
     if config.offchain_worker.enabled {
-
         sc_service::build_offchain_workers(
             &config,
             backend.clone(),

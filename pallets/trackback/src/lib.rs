@@ -19,7 +19,6 @@ mod tests;
 
 pub trait Config: frame_system::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
-
     type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 }
 
@@ -33,7 +32,6 @@ pub enum CropEntryResult {
 
 impl Default for CropEntryResult {
     fn default() -> Self {
-
         CropEntryResult::Rejected
     }
 }
@@ -48,7 +46,6 @@ pub enum BCILineResult {
 
 impl Default for BCILineResult {
     fn default() -> Self {
-
         BCILineResult::Rejected
     }
 }
