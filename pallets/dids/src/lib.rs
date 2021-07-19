@@ -9,16 +9,9 @@ pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
 
-    use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*, StorageHasher};
+    use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 
-    use sp_runtime::{
-        offchain as oc,
-        offchain::{
-            storage::StorageValueRef,
-            storage_lock::{BlockAndTime, StorageLock, Time},
-        },
-        AccountId32, DispatchResult,
-    };
+    
 
     use frame_system::{
         offchain::{
@@ -29,7 +22,7 @@ pub mod pallet {
         Account,
     };
 
-    use codec::EncodeLike;
+    
     use sp_std::str;
     use sp_std::vec::Vec;
     #[allow(dead_code)]
@@ -62,7 +55,7 @@ pub mod pallet {
     pub(super) type DIDDocument<T: Config> = StorageMap<
         _,
         Blake2_128Concat,
-        (Vec<u8>),
+        Vec<u8>,
         (T::Moment, Vec<u8>, T::BlockNumber, T::AccountId),
         ValueQuery,
     >;
@@ -129,7 +122,7 @@ pub mod pallet {
         }
 
         #[pallet::weight(0)]
-        pub fn update_did(origin: OriginFor<T>, did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
+        pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
             todo!();
             Ok(().into())
         }
@@ -154,7 +147,7 @@ pub mod pallet {
             );
 
             DIDDocument::<T>::insert(
-                (did_hash.clone()),
+                did_hash.clone(),
                 (time, did_document, block_number, &origin_account),
             );
 
