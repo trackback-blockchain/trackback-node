@@ -62,7 +62,6 @@ impl SubstrateCli for Cli {
 }
 
 /// Parse and run command line arguments
-
 pub fn run() -> sc_cli::Result<()> {
     let cli = Cli::from_args();
 
@@ -115,7 +114,6 @@ pub fn run() -> sc_cli::Result<()> {
                     import_queue,
                     ..
                 } = service::new_partial(&config)?;
-
                 Ok((cmd.run(client, import_queue), task_manager))
             })
         }
@@ -141,7 +139,6 @@ pub fn run() -> sc_cli::Result<()> {
 
                 runner.sync_run(|config| cmd.run::<Block, service::Executor>(config))
             } else {
-
                 Err("Benchmarking wasn't enabled when building the node. \
 				You can enable it with `--features runtime-benchmarks`."
                     .into())

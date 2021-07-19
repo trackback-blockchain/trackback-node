@@ -15,7 +15,6 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_transaction_pool::TransactionPool;
 
 /// Full client dependencies.
-
 pub struct FullDeps<C, P> {
     /// The client instance to use.
     pub client: Arc<C>,
@@ -36,7 +35,6 @@ where
     C::Api: BlockBuilder<Block>,
     P: TransactionPool + 'static,
 {
-
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
     use substrate_frame_rpc_system::{FullSystem, SystemApi};
 

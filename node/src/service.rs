@@ -21,9 +21,7 @@ native_executor_instance!(
 );
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
-
 type FullBackend = sc_service::TFullBackend<Block>;
-
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 
 pub fn new_partial(
@@ -52,18 +50,15 @@ pub fn new_partial(
     >,
     ServiceError,
 > {
-
     if config.keystore_remote.is_some() {
         return Err(ServiceError::Other(format!(
             "Remote Keystores are not supported."
         )));
     }
-
     let inherent_data_providers = sp_inherents::InherentDataProviders::new();
 
     let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
-
     let client = Arc::new(client);
 
     let select_chain = sc_consensus::LongestChain::new(backend.clone());
@@ -119,9 +114,7 @@ fn remote_keystore(_url: &String) -> Result<Arc<LocalKeystore>, &'static str> {
 }
 
 /// Builds a new service for a full client.
-
 pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> {
-
     let sc_service::PartialComponents {
         client,
         backend,
@@ -290,7 +283,6 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 }
 
 /// Builds a new service for a light client.
-
 pub fn new_light(mut config: Configuration) -> Result<TaskManager, ServiceError> {
     let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;

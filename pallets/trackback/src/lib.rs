@@ -16,7 +16,6 @@ mod mock;
 mod tests;
 
 /// Configure the pallet by specifying the parameters and types on which it depends.
-
 pub trait Config: frame_system::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
@@ -24,7 +23,6 @@ pub trait Config: frame_system::Config {
 
 // Represents a crop entry result from BELIS
 #[derive(Encode, Decode, Clone, PartialEq)]
-
 pub enum CropEntryResult {
     Accepted(Vec<u8>),
     Rejected,
@@ -38,7 +36,6 @@ impl Default for CropEntryResult {
 
 // Represents a bci line result from BELIS
 #[derive(Encode, Decode, Clone, PartialEq)]
-
 pub enum BCILineResult {
     Accepted,
     Rejected,
