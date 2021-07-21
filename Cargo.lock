@@ -3868,6 +3868,7 @@ dependencies = [
 name = "pallet-dids"
 version = "3.0.0"
 dependencies = [
+ "chrono",
  "frame-support",
  "frame-system",
  "log",

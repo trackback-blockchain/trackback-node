@@ -9,7 +9,10 @@ pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
 
-    use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
+    use frame_support::{
+        codec::{Decode, Encode},
+        dispatch::DispatchResultWithPostInfo, pallet_prelude::*
+    };
 
     use frame_system::{
         pallet_prelude::*,
@@ -18,11 +21,32 @@ pub mod pallet {
 
     use sp_std::str;
     use sp_std::vec::Vec;
-    #[allow(dead_code)]
+
+
+    #[derive(Clone, Decode, Encode, Eq, PartialEq)]
+    pub struct DIDAccounts {
+        // did_account_hash: Vec<u8>,
+        // Tracking number of issued DIDs  by the controller
+        public_key: Vec<u8>,
+
+        // Issued DID documents by the controller
+        did_documents: Vec<DID>
+    }
+
+    #[derive(Clone, Decode, Encode, Eq, PartialEq)]
     pub struct DID {
+        // DID Document hash: Vec<u8>,
         did_uri: Vec<u8>,
+
+        // DID Document
         did_document: Vec<u8>,
-        did_ref: Vec<u8>,
+
+        block_number: u128,
+        // Block time stamp in ISO 8601 format
+        block_time_stamp: Vec<u8>,
+
+        // IPFS  URI of the DID document
+        did_ref: Option<Vec<u8>>,
     }
 
     #[pallet::config]
