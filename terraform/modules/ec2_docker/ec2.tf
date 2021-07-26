@@ -89,10 +89,10 @@ chmod +x /usr/local/bin/docker-compose
 cd /home/ubuntu
 
 echo "run" > run
-git clone https://${var.git_token}@github.com/trackback-blockchain/tanz-demo-node.git
+git clone --single-branch --branch staging https://${var.git_token}@github.com/trackback-blockchain/tanz-demo-node.git
 cd tanz-demo-node
-## TODO:: git checkout brach
-## docker-compose up --build --force-recreate --remove-orphans -d
+mkdir .local
+docker-compose up --build --force-recreate --remove-orphans -d
 EOF
 
 }
