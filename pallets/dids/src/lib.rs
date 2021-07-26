@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 /// Decentralised Pallet Implementation TrackBack Limited
-mod did_operations;
+mod structs;
 mod ipfs_driver;
 mod utils;
 
@@ -10,7 +10,6 @@ pub use pallet::*;
 pub mod pallet {
 
     use frame_support::{
-        codec::{Decode, Encode},
         dispatch::DispatchResultWithPostInfo, pallet_prelude::*
     };
 
@@ -21,37 +20,13 @@ pub mod pallet {
 
     use sp_std::str;
     use sp_std::vec::Vec;
-
-
-    #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-    pub struct DIDAccounts {
-        // did_account_hash: Vec<u8>,
-        // Tracking number of issued DIDs  by the controller
-        public_key: Vec<u8>,
-
-        // Issued DID documents by the controller
-        did_documents: Vec<DID>
-    }
-
-    #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-    pub struct DID {
-        // DID Document hash: Vec<u8>,
-        did_uri: Vec<u8>,
-
-        // DID Document
-        did_document: Vec<u8>,
-
-        block_number: u128,
-        // Block time stamp in ISO 8601 format
-        block_time_stamp: Vec<u8>,
-
-        // IPFS  URI of the DID document
-        did_ref: Option<Vec<u8>>,
-    }
+    use frame_support::traits::UnixTime;
+    use crate::structs::DID;
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_timestamp::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+        type TimeProvider: UnixTime;
     }
 
     #[pallet::pallet]
@@ -61,15 +36,16 @@ pub mod pallet {
     /// Stores a DID document on chain
     /// Key 1 -> AccountId + DIDDocumentHash
     /// Key 2 -> Chain time
-    /// Value -> DID Document(hash) + BlockNumber
+    /// Value -> TimeStamp + DID Document(hash) + BlockNumber + AccountId
     #[pallet::storage]
     #[pallet::getter(fn get_did_document)]
     pub(super) type DIDDocument<T: Config> = StorageMap<
         _,
         Blake2_128Concat,
         Vec<u8>,
-        (T::Moment, Vec<u8>, T::BlockNumber, T::AccountId),
-        ValueQuery,
+        DID<T>,
+        // (u64, Vec<u8>, T::BlockNumber, T::AccountId),
+        // ValueQuery,
     >;
 
     /// Accounts associated with a DID
@@ -155,7 +131,7 @@ pub mod pallet {
 
             let block_number = <frame_system::Module<T>>::block_number();
 
-            let time = <pallet_timestamp::Module<T>>::get();
+            let time = T::TimeProvider::now().as_secs();
 
             ensure!(
                 !DIDDocument::<T>::contains_key(&did_hash),
@@ -164,8 +140,20 @@ pub mod pallet {
 
             DIDDocument::<T>::insert(
                 did_hash.clone(),
-                (time, did_document, block_number, &origin_account),
+                DID{
+                    did_uri: None,
+                    did_document,
+                    block_number,
+                    block_time_stamp: time,
+                    did_ref: None,
+                    sender_account_id: origin_account.clone()
+                }
             );
+
+            // DIDDocument::<T>::insert(
+            //     did_hash.clone(),
+            //     (time, did_document, block_number, &origin_account),
+            // );
 
             Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
 
