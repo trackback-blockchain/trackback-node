@@ -21,7 +21,7 @@ pub mod pallet {
     use sp_std::str;
     use sp_std::vec::Vec;
     use frame_support::traits::UnixTime;
-    use crate::structs::DID;
+    use crate::structs::{DID, VerifiableCredential};
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_timestamp::Config {
@@ -44,15 +44,30 @@ pub mod pallet {
         Blake2_128Concat,
         Vec<u8>,
         DID<T>,
-        // (u64, Vec<u8>, T::BlockNumber, T::AccountId),
-        // ValueQuery,
     >;
 
     /// Accounts associated with a DID
     #[pallet::storage]
     #[pallet::getter(fn get_did_accounts)]
-    pub(super) type DIDAccount<T: Config> =
-        StorageMap<_, Blake2_128Concat, T::AccountId, Vec<Vec<u8>>, ValueQuery>;
+    pub(super) type DIDs<T: Config> =
+        StorageMap<
+            _,
+            Blake2_128Concat,
+            // public key + Controller Account
+            (Vec<u8>, T::AccountId),
+            Vec<DID<T>>
+        >;
+
+    /// Stores a verifiable credential finger print
+    #[pallet::storage]
+    #[pallet::getter(fn get_verifiable_credential_hash)]
+    pub(super) type VC<T: Config> =
+        StorageMap<
+            _,
+            Blake2_128Concat,
+            Vec<u8>,
+            VerifiableCredential<T>
+    >;
 
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
@@ -64,6 +79,9 @@ pub mod pallet {
 
         /// DID Document revoked
         DIDDocumentRevoked(Vec<u8>, T::AccountId),
+
+        /// Verifiable credential fingerprint created
+        VerifiableCredentialFingerPrintCreated(Vec<u8>, T::AccountId, Vec<u8>)
     }
 
     #[pallet::error]
@@ -79,6 +97,9 @@ pub mod pallet {
 
         /// DID Document locked
         DIDLocked,
+
+        /// Verifiable credential exists
+        VerifiableCredentialExists
     }
 
     /// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
@@ -93,6 +114,38 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+
+        /// Stores hashes of verifiable credentials issued per issuer's account (aka controller)
+        /// Does not store any verifiable credential or user centric data on-chain store
+        #[pallet::weight(0)]
+        pub fn create_vc_fingerprint(
+            origin: OriginFor<T>,
+            public_key: Vec<u8>,
+            vc_hash: Vec<u8>,
+            active: Option<bool>
+        ) -> DispatchResultWithPostInfo{
+            let origin_account = ensure_signed(origin)?;
+
+            // Ensures a verifiable credential finger print does not exist
+            ensure!(!VC::<T>::contains_key(&vc_hash),
+                Error::<T>::VerifiableCredentialExists);
+
+            let time = T::TimeProvider::now().as_secs();
+
+            VC::<T>::insert(
+                vc_hash.clone(),
+                VerifiableCredential {
+                    account_id: None,
+                    public_key:public_key.clone(),
+                    block_time_stamp: time,
+                    active
+                }
+            );
+            Self::deposit_event(Event::VerifiableCredentialFingerPrintCreated(
+                vc_hash, origin_account, public_key)
+            );
+            Ok(().into())
+        }
 
         /// DID Revocation
         /// Throws DoesNotExists for a non existing DID revocation
@@ -116,7 +169,7 @@ pub mod pallet {
         /// Updates a DID document
         #[pallet::weight(0)]
         pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
-            Ok(().into())
+            todo!()
         }
 
         /// Stores a DID document
@@ -140,20 +193,16 @@ pub mod pallet {
 
             DIDDocument::<T>::insert(
                 did_hash.clone(),
-                DID{
+                DID {
                     did_uri: None,
                     did_document,
                     block_number,
                     block_time_stamp: time,
                     did_ref: None,
-                    sender_account_id: origin_account.clone()
+                    sender_account_id: origin_account.clone(),
+                    active: Some(true)
                 }
             );
-
-            // DIDDocument::<T>::insert(
-            //     did_hash.clone(),
-            //     (time, did_document, block_number, &origin_account),
-            // );
 
             Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
 

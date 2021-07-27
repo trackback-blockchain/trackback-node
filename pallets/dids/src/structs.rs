@@ -5,8 +5,7 @@ use frame_system::Config;
 use sp_std::vec::Vec;
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-pub struct DIDAccounts<T: Config> {
-    // did_account_hash: Vec<u8>,
+pub struct DIDDetail<T: Config> {
     // Tracking number of issued DIDs  by the controller
     public_key: Vec<u8>,
 
@@ -31,21 +30,33 @@ pub struct DID<T: Config> {
 
     // Sender AccountId
     pub sender_account_id: <T as frame_system::Config>::AccountId,
-}
 
-// impl<T> default for DID<T>{
-//
-// }
+    // Active status
+    pub active: Option<bool>
+}
 
 #[derive(Clone, Decode,Encode, Eq, PartialEq)]
 pub struct VerifiableCredential<T: Config>{
     // Controller's AccountId
-    account_id: T::AccountId,
+    pub account_id: Option<T::AccountId>,
 
     // Holder's public key
-    public_key: Vec<u8>,
+    pub public_key: Vec<u8>,
 
-    // Proof o existence
-    verifiable_credential_hash: Vec<u8>,
-    block_time_stamp: u64,
+    // Created time
+    pub block_time_stamp: u64,
+
+    // active
+    pub active: Option<bool>
+}
+
+impl<T: Config> Default for VerifiableCredential<T> {
+    fn default() -> Self {
+        Self {
+            account_id: None,
+            public_key: Vec::new(),
+            block_time_stamp: 0,
+            active: Some(false)
+        }
+    }
 }
