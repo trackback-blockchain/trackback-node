@@ -97,6 +97,7 @@ git clone --single-branch --branch staging https://${var.git_token}@github.com/t
 chown ubuntu:ubuntu -R tanz-demo-node
 cd tanz-demo-node
 mkdir .local
+# docker-compose -f docker-compose.dev.yml up --build --force-recreate --remove-orphans -d
 docker-compose up --build --force-recreate --remove-orphans -d
 EOF
 
