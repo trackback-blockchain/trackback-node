@@ -1,5 +1,5 @@
-data "aws_eip" "by_allocation_id" {
-  id = "eipalloc-02762875079a54e2e"
+data "aws_lb_target_group" "tg_substrateNode" {
+  arn  = "arn:aws:elasticloadbalancing:ap-southeast-2:533545012068:targetgroup/SubstrateNode/0314959edf168f21"
 }
 
 resource "aws_security_group" "tanz_node" {
@@ -56,7 +56,7 @@ resource "aws_security_group" "tanz_node" {
 
 
 
-resource "aws_instance" "tanz_web" {
+resource "aws_instance" "tanz_demo_web" {
   ami                         = "ami-0567f647e75c7bc05"
   instance_type               = "t3.medium"
   vpc_security_group_ids      = [aws_security_group.tanz_node.id]
@@ -64,7 +64,12 @@ resource "aws_instance" "tanz_web" {
   key_name                    = var.key_name
 
   tags = {
-    Name = "tanz_web"
+    Name = "tanz_demo_web"
+  }
+
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = 30
   }
 
   user_data = <<-EOF
@@ -88,21 +93,23 @@ chmod +x /usr/local/bin/docker-compose
 
 cd /home/ubuntu
 
-echo "run" > run
 git clone --single-branch --branch staging https://${var.git_token}@github.com/trackback-blockchain/tanz-demo-node.git
+chown ubuntu:ubuntu -R tanz-demo-node
 cd tanz-demo-node
 mkdir .local
+# docker-compose -f docker-compose.dev.yml up --build --force-recreate --remove-orphans -d
 docker-compose up --build --force-recreate --remove-orphans -d
 EOF
 
 }
 
-resource "aws_eip_association" "eip_assoc" {
-  instance_id   = aws_instance.tanz_web.id
-  allocation_id = data.aws_eip.by_allocation_id.id
+resource "aws_lb_target_group_attachment" "tg_attachment" {
+  target_group_arn = data.aws_lb_target_group.tg_substrateNode.arn
+  target_id        = aws_instance.tanz_demo_web.id
+  port             = 9944
 }
 
-output "public_ip" {
-  value = aws_instance.tanz_web
+output "tanz_demo_web" {
+  value = aws_instance.tanz_demo_web
 }
 

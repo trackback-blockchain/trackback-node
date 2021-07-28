@@ -1,0 +1,14 @@
+version: "3.2"
+
+services:
+    health:
+        image: donlokuge/nginx-hello
+        container_name: nginx-hello
+        ports:
+            - "80:80"
+    default:
+        image: 533545012068.dkr.ecr.ap-southeast-2.amazonaws.com/tanz-demo-node:latest 
+        ports:
+            - "9944:9944"
+            - "30333:30333"
+            - "9933:9933"

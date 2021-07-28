@@ -1,6 +1,11 @@
 version: "3.2"
 
 services:
+  health:
+    image: donlokuge/nginx-hello
+    container_name: nginx-hello
+    ports:
+        - "80:80"
   dev:
     container_name: node-template
     image: paritytech/ci-linux:production
