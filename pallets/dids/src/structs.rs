@@ -1,3 +1,5 @@
+//! Structs to use in DID pallet
+//!
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::codec::{Decode, Encode};

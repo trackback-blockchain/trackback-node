@@ -1,5 +1,62 @@
+//! TrackBack limited
+//! Decentralised Pallet Implementation TrackBack Limited
+//! Features in v0.0.1
+//! * Creates a decentralised identifier
+//! * Revokes a decentralised identifier
+//! * Checks an existence of a decentralised identifier
+//! * Creates a finger print of a verifiable credential
+//! * Checks an existence of a verifiable credential
+//!
+//! # Storage
+//! ## DIDDocument
+//! Stores a DID document on chain
+//! * Key 1 -> AccountId + DIDDocumentHash
+//! * Value -> DID structure
+//!
+//! ```rust
+//! #[pallet::storage]
+//! #[pallet::getter(fn get_did_document)]
+//! pub(super) type DIDDocument<T: Config> = StorageMap<
+//!        _,
+//!        Blake2_128Concat,
+//!        Vec<u8>,
+//!        DID<T>,
+//! >;
+//! ```
+//!
+//! ## DIDDocument
+//! Keeps trails of DID documents by combination of the  Issuer/Controller Account and a unique value
+//! * Key 1 -> AccountId + DIDDocumentHash
+//! * Value -> DID structure
+//!
+//! ```rust
+//! #[pallet::storage]
+//! #[pallet::getter(fn get_did_accounts)]
+//! pub(super) type DIDs<T: Config> =
+//! StorageMap<
+//!     _,
+//!     Blake2_128Concat,
+//!     (Vec<u8>, T::AccountId),
+//!     Vec<DID<T>>
+//! >;
+//! ```
+//! ## VerifiableCredential
+//! * Stores a fingerprint of a verifiableCredential
+//! * TODO: Will move to a separate pallet at MVP stage
+//! ```rust
+//! #[pallet::storage]//!
+//! #[pallet::getter(fn get_verifiable_credential_hash)]
+//! pub(super) type VC<T: Config> =
+//! StorageMap<
+//!     _,
+//!     Blake2_128Concat,
+//!     Vec<u8>,
+//!     VerifiableCredential<T>
+//!  >;
+//! ```
+
 #![cfg_attr(not(feature = "std"), no_std)]
-/// Decentralised Pallet Implementation TrackBack Limited
+
 mod structs;
 mod ipfs_driver;
 mod utils;
@@ -35,8 +92,7 @@ pub mod pallet {
 
     /// Stores a DID document on chain
     /// Key 1 -> AccountId + DIDDocumentHash
-    /// Key 2 -> Chain time
-    /// Value -> TimeStamp + DID Document(hash) + BlockNumber + AccountId
+    /// Value -> DID structure
     #[pallet::storage]
     #[pallet::getter(fn get_did_document)]
     pub(super) type DIDDocument<T: Config> = StorageMap<
@@ -69,11 +125,17 @@ pub mod pallet {
             VerifiableCredential<T>
     >;
 
+    /// # Pallet Events
+    /// * DIDDocumentCreated
+    /// - Returns the created    DID hash and the AccountId `(Vec<u8>, T::AccountId)`
+    /// * DIDDocumentRevoked
+    /// - Triggers when a DID revoked by a controller or a delegated authority `(Vec<u8>, T::AccountId)`
+    /// * VerifiableCredentialFingerprintCreated
+    /// - Returns Holder's Account, Issuer/Controller's Account and the verifiable credential hash
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
-        DIDCreated(T::AccountId, Vec<u8>),
         /// Event returns DID Document hash, DID URI, Sender's AccountId
         DIDDocumentCreated(Vec<u8>, T::AccountId),
 
@@ -103,6 +165,7 @@ pub mod pallet {
     }
 
     /// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
+    /// TODO: Functionality will be implemented in MVP stage
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
         fn offchain_worker(block_number: T::BlockNumber) {
