@@ -8,10 +8,9 @@ export TARGET_PORT					:= 80
 export REGION						:= ap-southeast-2
 export ECR_REPO_URL					:= 533545012068.dkr.ecr.ap-southeast-2.amazonaws.com
 export VERSION						:= latest
+export BRANCH_NAME					:=$(shell git branch --show-current)
 
-all:
-	cd terraform/ap-southeast-2 && terraform destroy --auto-approve
-	cd terraform/ap-southeast-2 && terraform apply --auto-approve
+all: deploy
 
 destroy:
 	cd terraform/ap-southeast-2 && terraform destroy --auto-approve
@@ -30,9 +29,8 @@ build: ecr
 	docker push $(ECR_REPO_URL)/$(PROJECT_NAME):$(VERSION)
 
 deploy:
-	cd terraform/ap-southeast-2 && terraform destroy --auto-approve
-	cd terraform/ap-southeast-2 && terraform apply --auto-approve
+	cd terraform/ap-southeast-2 && terraform destroy -var="branch_name=$(BRANCH_NAME)" --auto-approve 
+	cd terraform/ap-southeast-2 && terraform apply -var="branch_name=$(BRANCH_NAME)" --auto-approve 
 
 run-dev: ecr
 	docker-compose -f docker-compose.dev.yml up --build --force-recreate --remove-orphans -d
-
