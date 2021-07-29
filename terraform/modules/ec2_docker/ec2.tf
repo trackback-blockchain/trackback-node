@@ -98,6 +98,7 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 apt install -y unzip
 unzip awscliv2.zip
 sudo ./aws/install
+apt install -y make
 
 git clone --single-branch --branch staging https://${var.git_token}@github.com/trackback-blockchain/tanz-demo-node.git
 chown ubuntu:ubuntu -R tanz-demo-node
