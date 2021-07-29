@@ -1,5 +1,5 @@
 data "aws_lb_target_group" "tg_substrateNode" {
-  arn  = "arn:aws:elasticloadbalancing:ap-southeast-2:533545012068:targetgroup/SubstrateNode/0314959edf168f21"
+  arn = "arn:aws:elasticloadbalancing:ap-southeast-2:533545012068:targetgroup/SubstrateNode/0314959edf168f21"
 }
 
 resource "aws_security_group" "tanz_node" {
@@ -62,6 +62,7 @@ resource "aws_instance" "tanz_demo_web" {
   vpc_security_group_ids      = [aws_security_group.tanz_node.id]
   associate_public_ip_address = false
   key_name                    = var.key_name
+  iam_instance_profile        = aws_iam_instance_profile.tz-demo-profile.id
 
   tags = {
     Name = "tanz_demo_web"
@@ -93,12 +94,18 @@ chmod +x /usr/local/bin/docker-compose
 
 cd /home/ubuntu
 
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+apt install -y unzip
+unzip awscliv2.zip
+sudo ./aws/install
+apt install -y make
+
 git clone --single-branch --branch staging https://${var.git_token}@github.com/trackback-blockchain/tanz-demo-node.git
 chown ubuntu:ubuntu -R tanz-demo-node
+
 cd tanz-demo-node
-mkdir .local
-docker-compose -f docker-compose.dev.yml up --build --force-recreate --remove-orphans -d
-#docker-compose up --build --force-recreate --remove-orphans -d
+make run-dev
+
 EOF
 
 }
