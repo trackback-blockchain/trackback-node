@@ -1,6 +1,63 @@
+//! TrackBack limited
+//! Decentralised Pallet Implementation TrackBack Limited
+//! Features in v0.0.1
+//! * Creates a decentralised identifier
+//! * Revokes a decentralised identifier
+//! * Checks an existence of a decentralised identifier
+//! * Creates a finger print of a verifiable credential
+//! * Checks an existence of a verifiable credential
+//!
+//! # Storage
+//! ## DIDDocument
+//! Stores a DID document on chain
+//! * Key 1 -> AccountId + DIDDocumentHash
+//! * Value -> DID structure
+//!
+//! ```rust
+//! #[pallet::storage]
+//! #[pallet::getter(fn get_did_document)]
+//! pub(super) type DIDDocument<T: Config> = StorageMap<
+//!        _,
+//!        Blake2_128Concat,
+//!        Vec<u8>,
+//!        DID<T>,
+//! >;
+//! ```
+//!
+//! ## DIDDocument
+//! Keeps trails of DID documents by combination of the  Issuer/Controller Account and a unique value
+//! * Key 1 -> AccountId + DIDDocumentHash
+//! * Value -> DID structure
+//!
+//! ```rust
+//! #[pallet::storage]
+//! #[pallet::getter(fn get_did_accounts)]
+//! pub(super) type DIDs<T: Config> =
+//! StorageMap<
+//!     _,
+//!     Blake2_128Concat,
+//!     (Vec<u8>, T::AccountId),
+//!     Vec<DID<T>>
+//! >;
+//! ```
+//! ## VerifiableCredential
+//! * Stores a fingerprint of a verifiableCredential
+//! * TODO: Will move to a separate pallet at MVP stage
+//! ```rust
+//! #[pallet::storage]//!
+//! #[pallet::getter(fn get_verifiable_credential_hash)]
+//! pub(super) type VC<T: Config> =
+//! StorageMap<
+//!     _,
+//!     Blake2_128Concat,
+//!     Vec<u8>,
+//!     VerifiableCredential<T>
+//!  >;
+//! ```
+
 #![cfg_attr(not(feature = "std"), no_std)]
-/// Decentralised Pallet Implementation TrackBack Limited
-mod did_operations;
+
+mod structs;
 mod ipfs_driver;
 mod utils;
 
@@ -10,7 +67,6 @@ pub use pallet::*;
 pub mod pallet {
 
     use frame_support::{
-        codec::{Decode, Encode},
         dispatch::DispatchResultWithPostInfo, pallet_prelude::*
     };
 
@@ -21,37 +77,13 @@ pub mod pallet {
 
     use sp_std::str;
     use sp_std::vec::Vec;
-
-
-    #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-    pub struct DIDAccounts {
-        // did_account_hash: Vec<u8>,
-        // Tracking number of issued DIDs  by the controller
-        public_key: Vec<u8>,
-
-        // Issued DID documents by the controller
-        did_documents: Vec<DID>
-    }
-
-    #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-    pub struct DID {
-        // DID Document hash: Vec<u8>,
-        did_uri: Vec<u8>,
-
-        // DID Document
-        did_document: Vec<u8>,
-
-        block_number: u128,
-        // Block time stamp in ISO 8601 format
-        block_time_stamp: Vec<u8>,
-
-        // IPFS  URI of the DID document
-        did_ref: Option<Vec<u8>>,
-    }
+    use frame_support::traits::UnixTime;
+    use crate::structs::{DID, VerifiableCredential};
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_timestamp::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+        type TimeProvider: UnixTime;
     }
 
     #[pallet::pallet]
@@ -60,34 +92,58 @@ pub mod pallet {
 
     /// Stores a DID document on chain
     /// Key 1 -> AccountId + DIDDocumentHash
-    /// Key 2 -> Chain time
-    /// Value -> DID Document(hash) + BlockNumber
+    /// Value -> DID structure
     #[pallet::storage]
     #[pallet::getter(fn get_did_document)]
     pub(super) type DIDDocument<T: Config> = StorageMap<
         _,
         Blake2_128Concat,
         Vec<u8>,
-        (T::Moment, Vec<u8>, T::BlockNumber, T::AccountId),
-        ValueQuery,
+        DID<T>,
     >;
 
     /// Accounts associated with a DID
     #[pallet::storage]
     #[pallet::getter(fn get_did_accounts)]
-    pub(super) type DIDAccount<T: Config> =
-        StorageMap<_, Blake2_128Concat, T::AccountId, Vec<Vec<u8>>, ValueQuery>;
+    pub(super) type DIDs<T: Config> =
+        StorageMap<
+            _,
+            Blake2_128Concat,
+            // public key + Controller Account
+            (Vec<u8>, T::AccountId),
+            Vec<DID<T>>
+        >;
 
+    /// Stores a verifiable credential finger print
+    #[pallet::storage]
+    #[pallet::getter(fn get_verifiable_credential_hash)]
+    pub(super) type VC<T: Config> =
+        StorageMap<
+            _,
+            Blake2_128Concat,
+            Vec<u8>,
+            VerifiableCredential<T>
+    >;
+
+    /// # Pallet Events
+    /// * DIDDocumentCreated
+    /// - Returns the created    DID hash and the AccountId `(Vec<u8>, T::AccountId)`
+    /// * DIDDocumentRevoked
+    /// - Triggers when a DID revoked by a controller or a delegated authority `(Vec<u8>, T::AccountId)`
+    /// * VerifiableCredentialFingerprintCreated
+    /// - Returns Holder's Account, Issuer/Controller's Account and the verifiable credential hash
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
-        DIDCreated(T::AccountId, Vec<u8>),
         /// Event returns DID Document hash, DID URI, Sender's AccountId
         DIDDocumentCreated(Vec<u8>, T::AccountId),
 
         /// DID Document revoked
         DIDDocumentRevoked(Vec<u8>, T::AccountId),
+
+        /// Verifiable credential fingerprint created
+        VerifiableCredentialFingerPrintCreated(Vec<u8>, T::AccountId, Vec<u8>)
     }
 
     #[pallet::error]
@@ -103,9 +159,13 @@ pub mod pallet {
 
         /// DID Document locked
         DIDLocked,
+
+        /// Verifiable credential exists
+        VerifiableCredentialExists
     }
 
     /// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
+    /// TODO: Functionality will be implemented in MVP stage
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
         fn offchain_worker(block_number: T::BlockNumber) {
@@ -117,6 +177,42 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+
+        /// Stores hashes of verifiable credentials issued per issuer's account (aka controller)
+        /// Does not store any verifiable credential or user centric data on-chain store
+        #[pallet::weight(0)]
+        pub fn create_vc_fingerprint(
+            origin: OriginFor<T>,
+            public_key: Vec<u8>,
+            // mut public_key: Vec<u32>,
+
+            vc_hash: Vec<u8>,
+            active: Option<bool>
+        ) -> DispatchResultWithPostInfo{
+            let origin_account = ensure_signed(origin)?;
+
+            // Ensures a verifiable credential finger print does not exist
+            ensure!(!VC::<T>::contains_key(&vc_hash),
+                Error::<T>::VerifiableCredentialExists);
+
+            let _account = T::AccountId::decode(&mut &public_key[..]).
+                map_err(|_| "could not convert")?;
+            let time = T::TimeProvider::now().as_secs();
+
+            VC::<T>::insert(
+                vc_hash.clone(),
+                VerifiableCredential {
+                    account_id: None,
+                    public_key:public_key.clone(),
+                    block_time_stamp: time,
+                    active
+                }
+            );
+            Self::deposit_event(Event::VerifiableCredentialFingerPrintCreated(
+                vc_hash, origin_account, public_key)
+            );
+            Ok(().into())
+        }
 
         /// DID Revocation
         /// Throws DoesNotExists for a non existing DID revocation
@@ -140,7 +236,7 @@ pub mod pallet {
         /// Updates a DID document
         #[pallet::weight(0)]
         pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
-            Ok(().into())
+            todo!()
         }
 
         /// Stores a DID document
@@ -155,7 +251,7 @@ pub mod pallet {
 
             let block_number = <frame_system::Module<T>>::block_number();
 
-            let time = <pallet_timestamp::Module<T>>::get();
+            let time = T::TimeProvider::now().as_secs();
 
             ensure!(
                 !DIDDocument::<T>::contains_key(&did_hash),
@@ -164,7 +260,15 @@ pub mod pallet {
 
             DIDDocument::<T>::insert(
                 did_hash.clone(),
-                (time, did_document, block_number, &origin_account),
+                DID {
+                    did_uri: None,
+                    did_document,
+                    block_number,
+                    block_time_stamp: time,
+                    did_ref: None,
+                    sender_account_id: origin_account.clone(),
+                    active: Some(true)
+                }
             );
 
             Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
