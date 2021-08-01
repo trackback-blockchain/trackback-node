@@ -184,6 +184,8 @@ pub mod pallet {
         pub fn create_vc_fingerprint(
             origin: OriginFor<T>,
             public_key: Vec<u8>,
+            // mut public_key: Vec<u32>,
+
             vc_hash: Vec<u8>,
             active: Option<bool>
         ) -> DispatchResultWithPostInfo{
@@ -193,6 +195,8 @@ pub mod pallet {
             ensure!(!VC::<T>::contains_key(&vc_hash),
                 Error::<T>::VerifiableCredentialExists);
 
+            let _account = T::AccountId::decode(&mut &public_key[..]).
+                map_err(|_| "could not convert")?;
             let time = T::TimeProvider::now().as_secs();
 
             VC::<T>::insert(
