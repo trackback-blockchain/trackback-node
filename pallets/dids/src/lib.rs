@@ -14,9 +14,14 @@
 //! * Value -> DID structure
 //!
 //! ```rust
+//! use frame_support::Blake2_128Concat;
+//! use pallet_dids::Config;
+//! use frame_support::pallet_prelude::StorageMap;
+//!
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_did_document)]
-//! pub(super) type DIDDocument<T: Config> = StorageMap<
+//! pub(super) type DIDDocument<T: Config> =
+//! StorageMap<
 //!        _,
 //!        Blake2_128Concat,
 //!        Vec<u8>,
@@ -30,6 +35,9 @@
 //! * Value -> DID structure
 //!
 //! ```rust
+//! use frame_support::Blake2_128Concat;
+//! use pallet_dids::Config;
+//! use frame_support::pallet_prelude::StorageMap;
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_did_accounts)]
 //! pub(super) type DIDs<T: Config> =
@@ -44,7 +52,10 @@
 //! * Stores a fingerprint of a verifiableCredential
 //! * TODO: Will move to a separate pallet at MVP stage
 //! ```rust
-//! #[pallet::storage]//!
+//! use frame_support::Blake2_128Concat;
+//! use pallet_dids::Config;
+//! use frame_support::pallet_prelude::StorageMap;
+//! #[pallet::storage]
 //! #[pallet::getter(fn get_verifiable_credential_hash)]
 //! pub(super) type VC<T: Config> =
 //! StorageMap<
@@ -60,6 +71,12 @@
 mod structs;
 mod ipfs_driver;
 mod utils;
+
+#[cfg(test)]
+mod mock;
+
+#[cfg(test)]
+mod tests;
 
 pub use pallet::*;
 
