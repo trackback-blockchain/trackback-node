@@ -14,19 +14,13 @@
 //! * Value -> DID structure
 //!
 //! ```rust
+//! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
-//! use frame_support::pallet_prelude::StorageMap;
 //!
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_did_document)]
-//! pub(super) type DIDDocument<T: Config> =
-//! StorageMap<
-//!        _,
-//!        Blake2_128Concat,
-//!        Vec<u8>,
-//!        DID<T>,
-//! >;
+//! pub(super) type DIDDocument<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, DID<T>>;
 //! ```
 //!
 //! ## DIDDocument
@@ -35,41 +29,31 @@
 //! * Value -> DID structure
 //!
 //! ```rust
+//! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
-//! use frame_support::pallet_prelude::StorageMap;
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_did_accounts)]
 //! pub(super) type DIDs<T: Config> =
-//! StorageMap<
-//!     _,
-//!     Blake2_128Concat,
-//!     (Vec<u8>, T::AccountId),
-//!     Vec<DID<T>>
-//! >;
+//!     StorageMap<_, Blake2_128Concat, (Vec<u8>, T::AccountId), Vec<DID<T>>>;
 //! ```
 //! ## VerifiableCredential
 //! * Stores a fingerprint of a verifiableCredential
 //! * TODO: Will move to a separate pallet at MVP stage
 //! ```rust
+//! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
-//! use frame_support::pallet_prelude::StorageMap;
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_verifiable_credential_hash)]
 //! pub(super) type VC<T: Config> =
-//! StorageMap<
-//!     _,
-//!     Blake2_128Concat,
-//!     Vec<u8>,
-//!     VerifiableCredential<T>
-//!  >;
+//!     StorageMap<_, Blake2_128Concat, Vec<u8>, VerifiableCredential<T>>;
 //! ```
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod structs;
 mod ipfs_driver;
+mod structs;
 mod utils;
 
 #[cfg(test)]
@@ -83,19 +67,14 @@ pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
 
-    use frame_support::{
-        dispatch::DispatchResultWithPostInfo, pallet_prelude::*
-    };
+    use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 
-    use frame_system::{
-        pallet_prelude::*,
-    };
+    use frame_system::pallet_prelude::*;
 
-
+    use crate::structs::{VerifiableCredential, DID};
+    use frame_support::traits::UnixTime;
     use sp_std::str;
     use sp_std::vec::Vec;
-    use frame_support::traits::UnixTime;
-    use crate::structs::{DID, VerifiableCredential};
 
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_timestamp::Config {
@@ -112,35 +91,24 @@ pub mod pallet {
     /// Value -> DID structure
     #[pallet::storage]
     #[pallet::getter(fn get_did_document)]
-    pub(super) type DIDDocument<T: Config> = StorageMap<
-        _,
-        Blake2_128Concat,
-        Vec<u8>,
-        DID<T>,
-    >;
+    pub(super) type DIDDocument<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, DID<T>>;
 
     /// Accounts associated with a DID
     #[pallet::storage]
     #[pallet::getter(fn get_did_accounts)]
-    pub(super) type DIDs<T: Config> =
-        StorageMap<
-            _,
-            Blake2_128Concat,
-            // public key + Controller Account
-            (Vec<u8>, T::AccountId),
-            Vec<DID<T>>
-        >;
+    pub(super) type DIDs<T: Config> = StorageMap<
+        _,
+        Blake2_128Concat,
+        // public key + Controller Account
+        (Vec<u8>, T::AccountId),
+        Vec<DID<T>>,
+    >;
 
     /// Stores a verifiable credential finger print
     #[pallet::storage]
     #[pallet::getter(fn get_verifiable_credential_hash)]
     pub(super) type VC<T: Config> =
-        StorageMap<
-            _,
-            Blake2_128Concat,
-            Vec<u8>,
-            VerifiableCredential<T>
-    >;
+        StorageMap<_, Blake2_128Concat, Vec<u8>, VerifiableCredential<T>>;
 
     /// # Pallet Events
     /// * DIDDocumentCreated
@@ -160,7 +128,7 @@ pub mod pallet {
         DIDDocumentRevoked(Vec<u8>, T::AccountId),
 
         /// Verifiable credential fingerprint created
-        VerifiableCredentialFingerPrintCreated(Vec<u8>, T::AccountId, Vec<u8>)
+        VerifiableCredentialFingerPrintCreated(Vec<u8>, T::AccountId, Vec<u8>),
     }
 
     #[pallet::error]
@@ -178,7 +146,7 @@ pub mod pallet {
         DIDLocked,
 
         /// Verifiable credential exists
-        VerifiableCredentialExists
+        VerifiableCredentialExists,
     }
 
     /// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
@@ -186,7 +154,6 @@ pub mod pallet {
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
         fn offchain_worker(block_number: T::BlockNumber) {
-
             log::info!("TrackBack OCW");
             log::info!("{:?}", block_number);
         }
@@ -194,7 +161,6 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-
         /// Stores hashes of verifiable credentials issued per issuer's account (aka controller)
         /// Does not store any verifiable credential or user centric data on-chain store
         #[pallet::weight(0)]
@@ -202,32 +168,35 @@ pub mod pallet {
             origin: OriginFor<T>,
             public_key: Vec<u8>,
             // mut public_key: Vec<u32>,
-
             vc_hash: Vec<u8>,
-            active: Option<bool>
-        ) -> DispatchResultWithPostInfo{
+            active: Option<bool>,
+        ) -> DispatchResultWithPostInfo {
             let origin_account = ensure_signed(origin)?;
 
             // Ensures a verifiable credential finger print does not exist
-            ensure!(!VC::<T>::contains_key(&vc_hash),
-                Error::<T>::VerifiableCredentialExists);
+            ensure!(
+                !VC::<T>::contains_key(&vc_hash),
+                Error::<T>::VerifiableCredentialExists
+            );
 
-            let _account = T::AccountId::decode(&mut &public_key[..]).
-                map_err(|_| "could not convert")?;
+            let _account =
+                T::AccountId::decode(&mut &public_key[..]).map_err(|_| "could not convert")?;
             let time = T::TimeProvider::now().as_secs();
 
             VC::<T>::insert(
                 vc_hash.clone(),
                 VerifiableCredential {
                     account_id: None,
-                    public_key:public_key.clone(),
+                    public_key: public_key.clone(),
                     block_time_stamp: time,
-                    active
-                }
+                    active,
+                },
             );
             Self::deposit_event(Event::VerifiableCredentialFingerPrintCreated(
-                vc_hash, origin_account, public_key)
-            );
+                vc_hash,
+                origin_account,
+                public_key,
+            ));
             Ok(().into())
         }
 
@@ -235,7 +204,6 @@ pub mod pallet {
         /// Throws DoesNotExists for a non existing DID revocation
         #[pallet::weight(0)]
         pub fn revoke_did(origin: OriginFor<T>, did_hash: Vec<u8>) -> DispatchResultWithPostInfo {
-
             let origin_account = ensure_signed(origin)?;
 
             ensure!(
@@ -263,7 +231,6 @@ pub mod pallet {
             did_document: Vec<u8>,
             did_hash: Vec<u8>,
         ) -> DispatchResultWithPostInfo {
-
             let origin_account = ensure_signed(origin)?;
 
             let block_number = <frame_system::Module<T>>::block_number();
@@ -284,8 +251,8 @@ pub mod pallet {
                     block_time_stamp: time,
                     did_ref: None,
                     sender_account_id: origin_account.clone(),
-                    active: Some(true)
-                }
+                    active: Some(true),
+                },
             );
 
             Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
