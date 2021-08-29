@@ -1,5 +1,5 @@
 //! TrackBack limited
-//! Decentralised Pallet Implementation TrackBack Limited
+//! Decentralised Identifiers Pallet Implementation TrackBack Limited
 //! Features in v0.0.1
 //! * Creates a decentralised identifier
 //! * Revokes a decentralised identifier
@@ -13,11 +13,12 @@
 //! * Key 1 -> AccountId + DIDDocumentHash
 //! * Value -> DID structure
 //!
-//! ```rust
+//! # Example
+//! ```
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
-//!
+//! use frame_support::pallet;
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_did_document)]
 //! pub(super) type DIDDocument<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, DID<T>>;
@@ -28,10 +29,11 @@
 //! * Key 1 -> AccountId + DIDDocumentHash
 //! * Value -> DID structure
 //!
-//! ```rust
+//! ```
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
+//! use frame_support::pallet;
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_did_accounts)]
 //! pub(super) type DIDs<T: Config> =
@@ -40,10 +42,11 @@
 //! ## VerifiableCredential
 //! * Stores a fingerprint of a verifiableCredential
 //! * TODO: Will move to a separate pallet at MVP stage
-//! ```rust
+//! ```
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
+//! use frame_support::pallet;
 //! #[pallet::storage]
 //! #[pallet::getter(fn get_verifiable_credential_hash)]
 //! pub(super) type VC<T: Config> =

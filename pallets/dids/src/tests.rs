@@ -5,7 +5,7 @@ use crate::mock::Origin;
 use crate::mock::DIDModule;
 use frame_support::pallet_prelude::DispatchError;
 use frame_support::sp_runtime::app_crypto::sp_core::Hasher;
-use frame_support::{assert_err, assert_ok, Blake2_128};
+use frame_support::{assert_err, assert_ok};
 use sp_core::Blake2Hasher;
 
 #[test]
@@ -42,7 +42,7 @@ fn create_vc_exists() {
             public_key.clone(),
             hash.clone(),
             Some(true),
-        );
+        ).ok();
 
         assert_err!(
             DIDModule::create_vc_fingerprint(Origin::signed(1), public_key, hash, Some(true)),
@@ -109,7 +109,7 @@ fn create_an_existing_did() {
             Origin::signed(1),
             did_document.clone().as_bytes().to_vec(),
             did_hash.clone(),
-        );
+        ).ok();
 
         assert_err!(
             DIDModule::insert_did_document(
@@ -151,7 +151,7 @@ fn revoke_a_did() {
             Origin::signed(1),
             did_document.clone().as_bytes().to_vec(),
             did_hash.clone(),
-        );
+        ).ok();
 
         assert_ok!(
             DIDModule::revoke_did(
@@ -187,11 +187,11 @@ fn revoke_non_existing_did() {
             Origin::signed(1),
             did_document.clone().as_bytes().to_vec(),
             did_hash.clone(),
-        );
+        ).ok();
         DIDModule::revoke_did(
             Origin::signed(1),
             did_hash.clone()
-        );
+        ).ok();
         assert_err!(
             DIDModule::revoke_did(
                 Origin::signed(1),
