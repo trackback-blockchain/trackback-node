@@ -18,12 +18,25 @@ fn create_vc() {
     let hash = "Hash".as_bytes().to_vec();
 
     new_test_ext().execute_with(|| {
-        assert_ok!(DIDModule::create_vc_fingerprint(
+        let res = DIDModule::create_vc_fingerprint(
             Origin::signed(1),
             public_key,
             hash,
             Some(true)
-        ));
+        );
+        let p = 0;
+        // assert_ok!(DIDModule::create_vc_fingerprint(
+        //     Origin::signed(1),
+        //     public_key,
+        //     hash,
+        //     Some(true)
+        // ));
+        // assert_ok!(DIDModule::create_vc_fingerprint(
+        //     Origin::signed(1),
+        //     public_key,
+        //     hash,
+        //     Some(true)
+        // ));
     });
 }
 
