@@ -236,6 +236,9 @@ pub mod pallet {
         pub fn insert_did_document(
             origin: OriginFor<T>,
             did_document: Vec<u8>,
+            did_document_metadata: Option<Vec<u8>>,
+            did_resolution_metadata: Option<Vec<u8>>,
+            sender_account_id: <T as frame_system::Config>::AccountId,
             did_hash: Vec<u8>,
         ) -> DispatchResultWithPostInfo {
             let origin_account = ensure_signed(origin)?;
@@ -252,13 +255,12 @@ pub mod pallet {
             DIDDocument::<T>::insert(
                 did_hash.clone(),
                 DID {
-                    did_uri: None,
-                    did_document,
+                    did_document_metadata,
+                    did_resolution_metadata,
                     block_number,
                     block_time_stamp: time,
                     did_ref: None,
-                    sender_account_id: origin_account.clone(),
-                    active: Some(true),
+                    sender_account_id,
                 },
             );
 
