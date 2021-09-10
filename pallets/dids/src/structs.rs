@@ -17,11 +17,18 @@ pub struct DIDDetail<T: Config> {
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
 pub struct DID<T: Config> {
     // DID Document hash: Vec<u8>,
-    pub did_uri: Option<Vec<u8>>,
+    // pub did_uri: Option<Vec<u8>>,
 
     // DID Document
-    pub did_document: Vec<u8>,
+    // pub did_document: Vec<u8>,
 
+    // DID Resolution Metadata
+    pub did_resolution_metadata: Option<Vec<u8>>,
+
+    // DID Document Metadata
+    pub did_document_metadata: Option<Vec<u8>>,
+
+    // Block number
     pub block_number: <T as frame_system::Config>::BlockNumber,
     // Block time stamp in ISO 8601 format
     pub block_time_stamp: u64,
@@ -33,7 +40,7 @@ pub struct DID<T: Config> {
     pub sender_account_id: <T as frame_system::Config>::AccountId,
 
     // Active status
-    pub active: Option<bool>,
+    // pub active: Option<bool>,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]

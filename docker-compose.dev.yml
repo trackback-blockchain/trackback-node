@@ -7,7 +7,7 @@ services:
         ports:
             - "80:80"
     default:
-        image: 533545012068.dkr.ecr.ap-southeast-2.amazonaws.com/tanz-demo-node:latest 
+        image: 533545012068.dkr.ecr.ap-southeast-2.amazonaws.com/trackback-node:latest
         ports:
             - "9944:9944"
             - "30333:30333"
