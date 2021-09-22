@@ -26,5 +26,5 @@ services:
       options:
         awslogs-group: substrate
         awslogs-region: ap-southeast-2
-        awslogs-stream: poc_node
+        awslogs-stream: trackbackNode
     command: bash -c "cargo build --release && ./target/release/node-template --dev --ws-external"
