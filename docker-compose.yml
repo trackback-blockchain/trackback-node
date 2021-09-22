@@ -21,4 +21,10 @@ services:
       - type: bind
         source: ./.local
         target: /root/.local
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: substrate
+        awslogs-region: ap-southeast-2
+        awslogs-stream: poc_node
     command: bash -c "cargo build --release && ./target/release/node-template --dev --ws-external"
