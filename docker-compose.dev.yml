@@ -8,7 +8,19 @@ services:
             - "80:80"
     default:
         image: 533545012068.dkr.ecr.ap-southeast-2.amazonaws.com/tanz-demo-node:latest 
+        #build:
+        #     context: .
+        #     dockerfile  : ./Dockerfile.dev 
         ports:
             - "9944:9944"
             - "30333:30333"
             - "9933:9933"
+        environment:
+            - RUST_LOG=debug 
+            - RUST_BACKTRACE=1
+        logging:
+            driver: awslogs
+            options:
+                awslogs-group: substrate
+                awslogs-region: ap-southeast-2
+                awslogs-stream: trackbackNode       

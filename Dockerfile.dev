@@ -11,4 +11,4 @@ RUN rustup target add wasm32-unknown-unknown --toolchain nightly-2020-08-23
 RUN bash -c "cargo build --release"
 
 
-CMD ["./target/release/node-template", "--dev", "--ws-external"]
+CMD ["./target/release/node-template", "--dev", "-lruntime=debug","--ws-external"]

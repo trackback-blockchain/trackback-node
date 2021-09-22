@@ -16,6 +16,8 @@ services:
       - "9933:9933"
     environment:
       - CARGO_HOME=/var/www/node-template/.cargo
+      - RUST_LOG=debug 
+      - RUST_BACKTRACE=1
     volumes:
       - .:/var/www/node-template
       - type: bind
