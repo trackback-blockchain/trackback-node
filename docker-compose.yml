@@ -27,4 +27,4 @@ services:
         awslogs-group: substrate
         awslogs-region: ap-southeast-2
         awslogs-stream: trackbackNode
-    command: bash -c "cargo build --release && ./target/release/node-template --dev --ws-external"
+    command: bash -c "cargo build --release && RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/node-template -lruntime=debug --dev"
