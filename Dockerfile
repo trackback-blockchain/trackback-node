@@ -16,7 +16,7 @@ RUN cargo build --release --features $FEATURES
 
 FROM debian:buster-slim
 
-ARG NODE_TYPE=node-template
+ARG NODE_TYPE=trackback-node
 
 COPY ./LICENSE /build/LICENSE
 COPY --from=builder /build/target/release/$NODE_TYPE /usr/local/bin/node-executable

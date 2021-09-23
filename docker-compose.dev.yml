@@ -12,3 +12,12 @@ services:
             - "9944:9944"
             - "30333:30333"
             - "9933:9933"
+        environment:
+            - RUST_LOG=debug
+            - RUST_BACKTRACE=1
+        logging:
+            driver: awslogs
+            options:
+                awslogs-group: substrate
+                awslogs-region: ap-southeast-2
+                awslogs-stream: trackbackNode

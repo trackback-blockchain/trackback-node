@@ -20,6 +20,33 @@ data "aws_iam_policy_document" "tz-demo-role-ecr" {
       "ecr:DescribeImageScanFindings"
     ]
   }
+
+  statement {
+    effect = "Allow"
+
+    resources = ["*"]
+
+    actions = [
+      "cloudwatch:PutMetricData",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeTags",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    resources = ["arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"]
+
+    actions = [
+      "ssm:GetParameter"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "tz-demo-assume-role-policy" {

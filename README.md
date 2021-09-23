@@ -46,19 +46,19 @@ cargo build --release
 Purge any existing dev chain state:
 
 ```bash
-./target/release/node-template purge-chain --dev
+./target/release/trackback-node purge-chain --dev
 ```
 
 Start a dev chain:
 
 ```bash
-./target/release/node-template --dev
+./target/release/trackback-node--dev
 ```
 
 Or, start a dev chain with detailed logging:
 
 ```bash
-RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/node-template -lruntime=debug --dev
+RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/trackback-node -lruntime=debug --dev
 ```
 
 ### Multi-Node Local Testnet
@@ -72,12 +72,12 @@ If you want to see the multi-node consensus algorithm in action, refer to
 ```bash
 # Purge any chain data from previous runs
 # You will be prompted to type `y`
-./target/release/node-template purge-chain --base-path /tmp/alice --chain local
+./target/release/trckback-node purge-chain --base-path /tmp/alice --chain local
 ```
 
 ```bash
 # Start Alice's node
-./target/release/node-template \
+./target/release/trackback-node \
   --base-path /tmp/alice \
   --chain local \
   --alice \
@@ -90,11 +90,11 @@ If you want to see the multi-node consensus algorithm in action, refer to
 ```
 Starts Bob's node
 ```bash
-./target/release/node-template purge-chain --base-path /tmp/bob --chain local
+./target/release/trackback-node purge-chain --base-path /tmp/bob --chain local
 ```
 
 ```bash
-./target/release/node-template \
+./target/release/trackback-node \
   --base-path /tmp/bob \
   --chain local \
   --bob \
@@ -108,7 +108,7 @@ Starts Bob's node
 
 ### CLIon configuration
 ```bash
-run --bin node-template -- --base-path /tmp/alice --chain local --alice --port 30333 --ws-port 9944 --rpc-port 9933 --node-key 0000000000000000000000000000000000000000000000000000000000000001 --telemetry-url "wss://telemetry.polkadot.io/submit/ 0" --validator
+run --bin trackback-node -- --base-path /tmp/alice --chain local --alice --port 30333 --ws-port 9944 --rpc-port 9933 --node-key 0000000000000000000000000000000000000000000000000000000000000001 --telemetry-url "wss://telemetry.polkadot.io/submit/ 0" --validator
 ```
 
 ### Gets a full list of available APIs for the node

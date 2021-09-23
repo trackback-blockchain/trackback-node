@@ -58,19 +58,19 @@ resource "aws_security_group" "tanz_node" {
 
 resource "aws_instance" "tanz_demo_web" {
   ami                         = "ami-0567f647e75c7bc05"
-  instance_type               = "t3.medium"
+  instance_type               = "c4.xlarge"
   vpc_security_group_ids      = [aws_security_group.tanz_node.id]
   associate_public_ip_address = false
   key_name                    = var.key_name
   iam_instance_profile        = aws_iam_instance_profile.tz-demo-profile.id
 
   tags = {
-    Name = "tanz_demo_web"
+    Name = "TrackBack-Node"
   }
 
   root_block_device {
     volume_type = "gp2"
-    volume_size = 30
+    volume_size = 100
   }
 
   user_data = <<-EOF
@@ -100,10 +100,10 @@ unzip awscliv2.zip
 sudo ./aws/install
 apt install -y make
 
-git clone --single-branch --branch ${var.branch_name} https://${var.git_token}@github.com/trackback-blockchain/tanz-demo-node.git
-chown ubuntu:ubuntu -R tanz-demo-node
+git clone --single-branch --branch ${var.branch_name} https://${var.git_token}@github.com/trackback-blockchain/trackback-node.git repo
+chown ubuntu:ubuntu -R repo
 
-cd tanz-demo-node
+cd repo
 make run-dev
 
 EOF
