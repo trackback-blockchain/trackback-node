@@ -13,7 +13,7 @@ export BRANCH_NAME					:=$(shell git branch --show-current)
 all: deploy
 
 destroy:
-	cd terraform/ap-southeast-2 && terraform destroy -var="branch_name=$(BRANCH_NAME)" --auto-approve
+	cd terraform/ap-southeast-2/deployec2 && terraform destroy -var="branch_name=$(BRANCH_NAME)" --auto-approve
 
 ecr:
 	aws ecr get-login-password \
@@ -29,7 +29,7 @@ build: ecr
 	docker push $(ECR_REPO_URL)/$(PROJECT_NAME):$(VERSION)
 
 deploy: destroy
-	cd terraform/ap-southeast-2 && terraform apply -var="branch_name=$(BRANCH_NAME)" --auto-approve
+	cd terraform/ap-southeast-2/deployec2 && terraform apply -var="branch_name=$(BRANCH_NAME)" --auto-approve
 
 run-dev: ecr
 	docker-compose -f docker-compose.dev.yml up --build --force-recreate --remove-orphans -d
