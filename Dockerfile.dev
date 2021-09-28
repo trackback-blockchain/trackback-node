@@ -1,8 +1,8 @@
 FROM paritytech/ci-linux:production
 
-WORKDIR /var/www/node-template
+WORKDIR /var/www/trackback-node
 
-ADD . /var/www/node-template
+ADD . /var/www/trackback-node
 
 RUN rustup toolchain uninstall nightly
 RUN rustup toolchain install nightly-2020-08-23
@@ -11,4 +11,4 @@ RUN rustup target add wasm32-unknown-unknown --toolchain nightly-2020-08-23
 RUN bash -c "cargo build --release"
 
 
-CMD ["./target/release/node-template", "--dev", "--ws-external"]
+CMD ["./target/release/trackback-node", "--dev", "-lruntime=debug","--ws-external"]

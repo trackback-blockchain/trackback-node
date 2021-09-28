@@ -7,18 +7,26 @@ services:
     ports:
         - "80:80"
   dev:
-    container_name: node-template
+    container_name: trackback-node
     image: paritytech/ci-linux:production
-    working_dir: /var/www/node-template
+    working_dir: /var/www/trackback-node
     ports:
       - "9944:9944"
       - "30333:30333"
       - "9933:9933"
     environment:
-      - CARGO_HOME=/var/www/node-template/.cargo
+      - CARGO_HOME=/var/www/trackback-node.cargo
+      - RUST_LOG=debug
+      - RUST_BACKTRACE=1
     volumes:
-      - .:/var/www/node-template
+      - .:/var/www/trackback-node
       - type: bind
         source: ./.local
         target: /root/.local
-    command: bash -c "cargo build --release && ./target/release/node-template --dev --ws-external"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: substrate
+        awslogs-region: ap-southeast-2
+        awslogs-stream: trackbackNode
+    command: bash -c "cargo build --release && RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/trackback-node -lruntime=debug --dev"
