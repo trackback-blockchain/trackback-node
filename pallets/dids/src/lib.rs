@@ -14,8 +14,8 @@
 //! * Value -> DID structure
 //!
 //! # Example
-//! ```
-//! use frame_support::pallet_prelude::StorageMap;
+//! ```no_run
+//! use frame_support::pallet_prelude::{StorageMap};
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
 //! use frame_support::pallet;
@@ -29,7 +29,7 @@
 //! * Key 1 -> AccountId + DIDDocumentHash
 //! * Value -> DID structure
 //!
-//! ```
+//! ```no_run
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
@@ -42,7 +42,7 @@
 //! ## VerifiableCredential
 //! * Stores a fingerprint of a verifiableCredential
 //! * TODO: Will move to a separate pallet at MVP stage
-//! ```
+//! ```no_run
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
@@ -227,8 +227,15 @@ pub mod pallet {
 
         /// Updates a DID document
         #[pallet::weight(0)]
-        pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
-            todo!()
+        pub fn update_did(
+            origin: OriginFor<T>,
+            did_uri: Vec<u8>,
+            did_document: Vec<u8>
+        ) -> DispatchResultWithPostInfo {
+            let origin_account = ensure_signed(origin)?;
+            let did_document = DIDDocument::<T>::get(did_uri);
+            // DIDDocument::<T>::mutate(&did_document)
+            Ok(().into())
         }
 
         /// Stores a DID document

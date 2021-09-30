@@ -51,6 +51,58 @@ pub fn did_hash(did_document: &'static str) -> Vec<u8> {
     Blake2Hasher::hash(did_document.as_ref()).as_bytes().to_vec()
 }
 
+// #[fixture]
+// pub fn make_did_document(
+//     did_document_metadata: Option<Vec<u8>>,
+//     did_resolution_metadata: Option<Vec<u8>>,
+//     did_document: &'static str, did_hash: Vec<u8>
+// )
+// {
+//     let p = new_test_ext().execute_with(|| {
+//         assert_ok!(DIDModule::insert_did_document(
+//             Origin::signed(1),
+//             did_document.as_bytes().to_vec(),
+//             did_document_metadata,
+//             did_resolution_metadata,
+//             10,
+//             did_hash
+//         ));
+//     });
+// }
+
+
+// #[rstest]
+// fn cd(make_did_document:(), did_document_metadata: Option<Vec<u8>>, did_resolution_metadata: Option<Vec<u8>>, did_document: &'static str, did_hash: Vec<u8>)  {
+//
+//     new_test_ext().execute_with(|| {
+//     //     DIDModule::insert_did_document(
+//     //         Origin::signed(1),
+//     //         did_document.as_bytes().to_vec(),
+//     //         did_document_metadata.clone(),
+//     //         did_resolution_metadata.clone(),
+//     //         10,
+//     //         did_hash.clone()
+//     //     ).ok();
+//
+//         assert_err!(
+//         DIDModule::insert_did_document(
+//             Origin::signed(1),
+//             did_document.as_bytes().to_vec(),
+//             did_document_metadata,
+//             did_resolution_metadata,
+//             10,
+//             did_hash.clone()
+//         ),
+//             DispatchError::Module {
+//                 index: 1,
+//                 error: 0,
+//                 message: Some("DIDExists")
+//             }
+//         );
+//     });
+// }
+
+
 #[fixture]
 pub fn public_key() ->Vec<u8> {
     vec![
