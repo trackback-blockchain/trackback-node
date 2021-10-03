@@ -78,7 +78,6 @@ pub mod pallet {
     use frame_support::traits::UnixTime;
     use sp_std::str;
     use sp_std::vec::Vec;
-    use crate::tests::did_resolution_metadata;
 
 
     #[pallet::config]
@@ -256,13 +255,12 @@ pub mod pallet {
                         d.did_document_metadata = did_document_metadata;
                         d.public_keys = public_keys;
                         d.did_ref = did_ref;
-
+                        d.updated_timestamp = T::TimeProvider::now().as_secs();
                         Ok(())
                     }
                 }
             })?;
             Self::deposit_event(Event::DIDDocumentUpdated(did_uri));
-            // let mut did_document = DIDDocument::<T>::get(did_uri.clone());
 
             Ok(().into())
         }
