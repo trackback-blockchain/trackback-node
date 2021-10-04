@@ -14,8 +14,8 @@
 //! * Value -> DID structure
 //!
 //! # Example
-//! ```
-//! use frame_support::pallet_prelude::StorageMap;
+//! ```no_run
+//! use frame_support::pallet_prelude::{StorageMap};
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
 //! use frame_support::pallet;
@@ -29,7 +29,7 @@
 //! * Key 1 -> AccountId + DIDDocumentHash
 //! * Value -> DID structure
 //!
-//! ```
+//! ```no_run
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
@@ -42,7 +42,7 @@
 //! ## VerifiableCredential
 //! * Stores a fingerprint of a verifiableCredential
 //! * TODO: Will move to a separate pallet at MVP stage
-//! ```
+//! ```no_run
 //! use frame_support::pallet_prelude::StorageMap;
 //! use frame_support::Blake2_128Concat;
 //! use pallet_dids::Config;
@@ -79,11 +79,15 @@ pub mod pallet {
     use sp_std::str;
     use sp_std::vec::Vec;
 
+
     #[pallet::config]
     pub trait Config: frame_system::Config + pallet_timestamp::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
         type TimeProvider: UnixTime;
     }
+
+    #[allow(non_camel_case_types)]
+    pub type didURI  = Vec<u8>;
 
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
@@ -97,7 +101,7 @@ pub mod pallet {
     pub(super) type DIDDocument<T: Config> = StorageMap<
         _,
         Blake2_128Concat,
-        Vec<u8>,
+        didURI,
         DID<T>
     >;
 
@@ -137,6 +141,9 @@ pub mod pallet {
 
         /// Verifiable credential fingerprint created
         VerifiableCredentialFingerPrintCreated(Vec<u8>, T::AccountId, Vec<u8>),
+
+        /// DID Document updated
+        DIDDocumentUpdated(Vec<u8>)
     }
 
     #[pallet::error]
@@ -227,8 +234,35 @@ pub mod pallet {
 
         /// Updates a DID document
         #[pallet::weight(0)]
-        pub fn update_did(_origin: OriginFor<T>, _did_doc: Vec<u8>) -> DispatchResultWithPostInfo {
-            todo!()
+        pub fn update_did(
+            origin: OriginFor<T>,
+            did_uri: Vec<u8>,
+            did_resolution_metadata: Option<Vec<u8>>,
+            did_document_metadata: Option<Vec<u8>>,
+            public_keys: Option<Vec<u8>>,
+            did_ref: Option<Vec<u8>>
+        ) -> DispatchResultWithPostInfo {
+            let _origin_account = ensure_signed(origin)?;
+
+
+            DIDDocument::<T>::mutate(did_uri.clone(), |did| {
+                match did {
+                    None => {
+                        return Err(Error::<T>::DIDDoesNotExists)
+                    }
+                    Some(d) => {
+                        d.did_resolution_metadata = did_resolution_metadata;
+                        d.did_document_metadata = did_document_metadata;
+                        d.public_keys = public_keys;
+                        d.did_ref = did_ref;
+                        d.updated_timestamp = T::TimeProvider::now().as_secs();
+                        Ok(())
+                    }
+                }
+            })?;
+            Self::deposit_event(Event::DIDDocumentUpdated(did_uri));
+
+            Ok(().into())
         }
 
         /// Stores a DID document
@@ -258,9 +292,11 @@ pub mod pallet {
                     did_document_metadata,
                     did_resolution_metadata,
                     block_number,
-                    block_time_stamp: time,
+                    block_time_stamp: time.clone(),
+                    updated_timestamp: time,
                     did_ref: None,
                     sender_account_id,
+                    public_keys: None
                 },
             );
 

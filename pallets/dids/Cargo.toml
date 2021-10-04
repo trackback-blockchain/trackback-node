@@ -23,6 +23,9 @@ sp-io = { default-features = false, version = '3.0.0' }
 sp-runtime = { default-features = false, version = '3.0.0' }
 rstest = { version = "0.11.0" }
 
+[lib]
+doctest = false
+
 [features]
 default = ['std']
 std = [
