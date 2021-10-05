@@ -12,6 +12,11 @@ use sp_core::Blake2Hasher;
 
 
 #[fixture]
+pub fn did_ref() -> Option<Vec<u8>> {
+    Some(r#"{QmcNYMJBhvbrH8oTo5QGNUFA5rhKpBVXHBpfiecxso7D8P}"#.as_bytes().to_vec())
+}
+
+#[fixture]
 pub fn did_document_metadata() -> Option<Vec<u8>> {
      Some(r#"{
         "created": "2002-01-01T20:20:20Z",
@@ -47,7 +52,7 @@ pub fn did_document() -> &'static str {
 }
 
 #[fixture]
-pub fn did_hash(did_document: &'static str) -> Vec<u8> {
+pub fn did_uri(did_document: &'static str) -> Vec<u8> {
     Blake2Hasher::hash(did_document.as_ref()).as_bytes().to_vec()
 }
 
@@ -104,7 +109,9 @@ fn create_did(
     did_document_metadata: Option<Vec<u8>>,
     did_resolution_metadata: Option<Vec<u8>>,
     did_document: &'static str,
-    did_hash: Vec<u8>
+    did_uri: Vec<u8>,
+    did_ref: Option<Vec<u8>>,
+    public_key: Vec<u8>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -113,8 +120,9 @@ fn create_did(
             did_document.as_bytes().to_vec(),
             did_document_metadata,
             did_resolution_metadata,
-            10,
-            did_hash
+            public_key,
+            did_uri,
+            did_ref
         ));
     });
 }
@@ -124,7 +132,9 @@ fn create_an_existing_did(
     did_document_metadata: Option<Vec<u8>>,
     did_resolution_metadata: Option<Vec<u8>>,
     did_document: &'static str,
-    did_hash: Vec<u8>
+    did_uri: Vec<u8>,
+    did_ref: Option<Vec<u8>>,
+    public_key: Vec<u8>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -133,8 +143,9 @@ fn create_an_existing_did(
             did_document.as_bytes().to_vec(),
             did_document_metadata.clone(),
             did_resolution_metadata.clone(),
-            10,
-            did_hash.clone()
+            public_key.clone(),
+            did_uri.clone(),
+            did_ref.clone()
         ).ok();
 
         assert_err!(
@@ -143,8 +154,9 @@ fn create_an_existing_did(
                 did_document.as_bytes().to_vec(),
                 did_document_metadata,
                 did_resolution_metadata,
-                10,
-                did_hash.clone()
+                public_key,
+                did_uri.clone(),
+                did_ref
             ),
             DispatchError::Module {
                 index: 1,
@@ -160,7 +172,9 @@ fn revoke_a_did(
     did_document_metadata: Option<Vec<u8>>,
     did_resolution_metadata: Option<Vec<u8>>,
     did_document: &'static str,
-    did_hash: Vec<u8>
+    did_uri: Vec<u8>,
+    public_key: Vec<u8>,
+    did_ref: Option<Vec<u8>>,
 ) {
 
     new_test_ext().execute_with(|| {
@@ -169,14 +183,15 @@ fn revoke_a_did(
             did_document.as_bytes().to_vec(),
             did_document_metadata.clone(),
             did_resolution_metadata.clone(),
-            10,
-            did_hash.clone()
+            public_key,
+            did_uri.clone(),
+            did_ref
         ).ok();
 
         assert_ok!(
             DIDModule::revoke_did(
                 Origin::signed(1),
-                did_hash
+                did_uri
             )
         );
     });
@@ -187,7 +202,9 @@ fn revoke_non_existing_did(
     did_document_metadata: Option<Vec<u8>>,
     did_resolution_metadata: Option<Vec<u8>>,
     did_document: &'static str,
-    did_hash: Vec<u8>
+    did_uri: Vec<u8>,
+    public_key: Vec<u8>,
+    did_ref: Option<Vec<u8>>,
 ) {
 
     new_test_ext().execute_with(|| {
@@ -196,26 +213,27 @@ fn revoke_non_existing_did(
             did_document.as_bytes().to_vec(),
             did_document_metadata.clone(),
             did_resolution_metadata.clone(),
-            10,
-            did_hash.clone()
+            public_key,
+            did_uri.clone(),
+            did_ref
         ).ok();
 
         DIDModule::revoke_did(
             Origin::signed(1),
-            did_hash.clone()
+            did_uri.clone()
         ).ok();
 
     });
 }
 
 #[rstest]
-fn revoke_a_revoked_did(did_hash: Vec<u8>)
+fn revoke_a_revoked_did(did_uri: Vec<u8>)
 {
     new_test_ext().execute_with(|| {
         assert_err!(
             DIDModule::revoke_did(
                 Origin::signed(1),
-                did_hash
+                did_uri
             ),
             DispatchError::Module {
                 index: 1,
@@ -231,7 +249,9 @@ fn update_did(
     did_document_metadata: Option<Vec<u8>>,
     did_resolution_metadata: Option<Vec<u8>>,
     did_document: &'static str,
-    did_hash: Vec<u8>
+    did_uri: Vec<u8>,
+    public_key: Vec<u8>,
+    did_ref: Option<Vec<u8>>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -240,17 +260,18 @@ fn update_did(
             did_document.as_bytes().to_vec(),
             did_document_metadata.clone(),
             did_resolution_metadata.clone(),
-            10,
-            did_hash.clone()
+            public_key,
+            did_uri.clone(),
+            did_ref.clone()
         ).ok();
         assert_ok!(
             DIDModule::update_did(
                 Origin::signed(1),
-                did_hash.clone(),
+                did_uri.clone(),
                 did_resolution_metadata,
                 did_document_metadata,
                 None,
-                None,
+                None
                 )
             );
         }
@@ -258,22 +279,30 @@ fn update_did(
 }
 
 #[rstest]
-fn update_non_exsited_did(did_document_metadata: Option<Vec<u8>>, did_resolution_metadata: Option<Vec<u8>>, did_document: &'static str, did_hash: Vec<u8>) {
-    let did_uri =Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
+fn update_non_exsited_did(
+    did_document_metadata: Option<Vec<u8>>,
+    did_resolution_metadata: Option<Vec<u8>>,
+    did_document: &'static str,
+    did_uri: Vec<u8>,
+    public_key: Vec<u8>,
+    did_ref: Option<Vec<u8>>
+) {
+    let non_existed_did_uri =Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
     new_test_ext().execute_with(|| {
         DIDModule::insert_did_document(
             Origin::signed(1),
             did_document.as_bytes().to_vec(),
             did_document_metadata.clone(),
             did_resolution_metadata.clone(),
-            10,
-            did_hash.clone()
+            public_key,
+            did_uri.clone(),
+            did_ref
         ).ok();
 
         assert_err!(
             DIDModule::update_did(
                 Origin::signed(1),
-                did_uri,
+                non_existed_did_uri,
                 did_resolution_metadata,
                 did_document_metadata,
                 None,

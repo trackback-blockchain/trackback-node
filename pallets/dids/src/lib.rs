@@ -86,9 +86,6 @@ pub mod pallet {
         type TimeProvider: UnixTime;
     }
 
-    #[allow(non_camel_case_types)]
-    pub type didURI  = Vec<u8>;
-
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T>(_);
@@ -101,7 +98,7 @@ pub mod pallet {
     pub(super) type DIDDocument<T: Config> = StorageMap<
         _,
         Blake2_128Concat,
-        didURI,
+        Vec<u8>,
         DID<T>
     >;
 
@@ -217,17 +214,17 @@ pub mod pallet {
         /// DID Revocation
         /// Throws DoesNotExists for a non existing DID revocation
         #[pallet::weight(0)]
-        pub fn revoke_did(origin: OriginFor<T>, did_hash: Vec<u8>) -> DispatchResultWithPostInfo {
+        pub fn revoke_did(origin: OriginFor<T>, did_uri: Vec<u8>) -> DispatchResultWithPostInfo {
             let origin_account = ensure_signed(origin)?;
 
             ensure!(
-                DIDDocument::<T>::contains_key(&did_hash),
+                DIDDocument::<T>::contains_key(&did_uri),
                 Error::<T>::DIDDoesNotExists
             );
 
-            DIDDocument::<T>::remove(&did_hash);
+            DIDDocument::<T>::remove(&did_uri);
 
-            Self::deposit_event(Event::DIDDocumentRevoked(did_hash, origin_account));
+            Self::deposit_event(Event::DIDDocumentRevoked(did_uri, origin_account));
 
             Ok(().into())
         }
@@ -272,8 +269,9 @@ pub mod pallet {
             did_document: Vec<u8>,
             did_document_metadata: Option<Vec<u8>>,
             did_resolution_metadata: Option<Vec<u8>>,
-            sender_account_id: <T as frame_system::Config>::AccountId,
-            did_hash: Vec<u8>,
+            sender_account_id: Vec<u8>,
+            did_uri: Vec<u8>,
+            did_ref: Option<Vec<u8>>,
         ) -> DispatchResultWithPostInfo {
             let origin_account = ensure_signed(origin)?;
 
@@ -282,25 +280,25 @@ pub mod pallet {
             let time = T::TimeProvider::now().as_secs();
 
             ensure!(
-                !DIDDocument::<T>::contains_key(&did_hash),
+                !DIDDocument::<T>::contains_key(&did_uri),
                 Error::<T>::DIDExists
             );
 
             DIDDocument::<T>::insert(
-                did_hash.clone(),
+                did_uri.clone(),
                 DID {
                     did_document_metadata,
                     did_resolution_metadata,
                     block_number,
                     block_time_stamp: time.clone(),
                     updated_timestamp: time,
-                    did_ref: None,
+                    did_ref: did_ref,
                     sender_account_id,
-                    public_keys: None
+                    public_keys: None,
                 },
             );
 
-            Self::deposit_event(Event::DIDDocumentCreated(did_hash, origin_account));
+            Self::deposit_event(Event::DIDDocumentCreated(did_uri, origin_account));
 
             Ok(().into())
         }

@@ -33,7 +33,7 @@ pub struct DID<T: Config> {
     pub did_ref: Option<Vec<u8>>,
 
     // Sender AccountId
-    pub sender_account_id: <T as frame_system::Config>::AccountId,
+    pub sender_account_id: Vec<u8>,
 
     // public keys
     pub public_keys: Option<Vec<u8>>
