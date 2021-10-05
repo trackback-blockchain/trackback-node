@@ -292,7 +292,7 @@ pub mod pallet {
                     block_number,
                     block_time_stamp: time.clone(),
                     updated_timestamp: time,
-                    did_ref: did_ref,
+                    did_ref,
                     sender_account_id,
                     public_keys: None,
                 },
