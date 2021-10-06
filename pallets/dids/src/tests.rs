@@ -21,7 +21,7 @@ pub fn did_ref() -> Option<Vec<u8>> {
 #[fixture]
 pub fn public_keys() -> Option<Vec<Vec<u8>>> {
     let mut public_keys = Vec::new();
-    for x in 0..10 {
+    for _ in 0..10 {
         let pk = thread_rng()
             .sample_iter(&Alphanumeric)
             .take(60)
@@ -127,7 +127,8 @@ fn create_did(
     did_document: &'static str,
     did_uri: Vec<u8>,
     did_ref: Option<Vec<u8>>,
-    public_key: Vec<u8>
+    public_key: Vec<u8>,
+    public_keys: Option<Vec<Vec<u8>>>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -138,7 +139,8 @@ fn create_did(
             did_resolution_metadata,
             public_key,
             did_uri,
-            did_ref
+            did_ref,
+            public_keys
         ));
     });
 }
@@ -150,7 +152,8 @@ fn create_an_existing_did(
     did_document: &'static str,
     did_uri: Vec<u8>,
     did_ref: Option<Vec<u8>>,
-    public_key: Vec<u8>
+    public_key: Vec<u8>,
+    public_keys: Option<Vec<Vec<u8>>>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -161,7 +164,8 @@ fn create_an_existing_did(
             did_resolution_metadata.clone(),
             public_key.clone(),
             did_uri.clone(),
-            did_ref.clone()
+            did_ref.clone(),
+            public_keys.clone()
         ).ok();
 
         assert_err!(
@@ -172,7 +176,8 @@ fn create_an_existing_did(
                 did_resolution_metadata,
                 public_key,
                 did_uri.clone(),
-                did_ref
+                did_ref,
+                public_keys.clone()
             ),
             DispatchError::Module {
                 index: 1,
@@ -191,6 +196,7 @@ fn revoke_a_did(
     did_uri: Vec<u8>,
     public_key: Vec<u8>,
     did_ref: Option<Vec<u8>>,
+    public_keys: Option<Vec<Vec<u8>>>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -201,7 +207,8 @@ fn revoke_a_did(
             did_resolution_metadata.clone(),
             public_key,
             did_uri.clone(),
-            did_ref
+            did_ref,
+            public_keys
         ).ok();
 
         assert_ok!(
@@ -221,6 +228,7 @@ fn revoke_non_existing_did(
     did_uri: Vec<u8>,
     public_key: Vec<u8>,
     did_ref: Option<Vec<u8>>,
+    public_keys: Option<Vec<Vec<u8>>>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -231,7 +239,8 @@ fn revoke_non_existing_did(
             did_resolution_metadata.clone(),
             public_key,
             did_uri.clone(),
-            did_ref
+            did_ref,
+            public_keys
         ).ok();
 
         DIDModule::revoke_did(
@@ -267,7 +276,8 @@ fn update_did(
     did_document: &'static str,
     did_uri: Vec<u8>,
     public_key: Vec<u8>,
-    did_ref: Option<Vec<u8>>
+    did_ref: Option<Vec<u8>>,
+    public_keys: Option<Vec<Vec<u8>>>
 ) {
 
     new_test_ext().execute_with(|| {
@@ -278,7 +288,8 @@ fn update_did(
             did_resolution_metadata.clone(),
             public_key,
             did_uri.clone(),
-            did_ref.clone()
+            did_ref.clone(),
+            public_keys
         ).ok();
         assert_ok!(
             DIDModule::update_did(
@@ -301,7 +312,8 @@ fn update_non_exsited_did(
     did_document: &'static str,
     did_uri: Vec<u8>,
     public_key: Vec<u8>,
-    did_ref: Option<Vec<u8>>
+    did_ref: Option<Vec<u8>>,
+    public_keys: Option<Vec<Vec<u8>>>
 ) {
     let non_existed_did_uri =Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
     new_test_ext().execute_with(|| {
@@ -312,7 +324,8 @@ fn update_non_exsited_did(
             did_resolution_metadata.clone(),
             public_key,
             did_uri.clone(),
-            did_ref
+            did_ref,
+            public_keys
         ).ok();
 
         assert_err!(

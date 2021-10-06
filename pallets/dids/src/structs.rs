@@ -36,7 +36,7 @@ pub struct DID<T: Config> {
     pub sender_account_id: Vec<u8>,
 
     // public keys
-    pub public_keys: Option<Vec<u8>>
+    pub public_keys: Option<Vec<Vec<u8>>>
 
 }
 
