@@ -9,12 +9,28 @@ use frame_support::pallet_prelude::DispatchError;
 use frame_support::sp_runtime::app_crypto::sp_core::Hasher;
 use frame_support::{assert_err, assert_ok};
 use sp_core::Blake2Hasher;
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
 
 
 #[fixture]
 pub fn did_ref() -> Option<Vec<u8>> {
     Some(r#"{QmcNYMJBhvbrH8oTo5QGNUFA5rhKpBVXHBpfiecxso7D8P}"#.as_bytes().to_vec())
 }
+
+#[fixture]
+pub fn public_keys() -> Option<Vec<Vec<u8>>> {
+    let mut public_keys = Vec::new();
+    for x in 0..10 {
+        let pk = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(60)
+            .collect::<Vec<_>>();
+        public_keys.push(pk);
+    }
+    Some(public_keys)
+}
+
 
 #[fixture]
 pub fn did_document_metadata() -> Option<Vec<u8>> {

@@ -272,6 +272,7 @@ pub mod pallet {
             sender_account_id: Vec<u8>,
             did_uri: Vec<u8>,
             did_ref: Option<Vec<u8>>,
+            public_keys: Option<Vec<u8>>
         ) -> DispatchResultWithPostInfo {
             let origin_account = ensure_signed(origin)?;
 
@@ -294,7 +295,7 @@ pub mod pallet {
                     updated_timestamp: time,
                     did_ref,
                     sender_account_id,
-                    public_keys: None,
+                    public_keys,
                 },
             );
 

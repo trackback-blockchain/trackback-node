@@ -22,6 +22,7 @@ sp-core = { default-features = false, version = '3.0.0' }
 sp-io = { default-features = false, version = '3.0.0' }
 sp-runtime = { default-features = false, version = '3.0.0' }
 rstest = { version = "0.11.0" }
+rand = { version = "0.8.4"}
 
 [lib]
 doctest = false
