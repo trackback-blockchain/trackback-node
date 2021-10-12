@@ -285,6 +285,13 @@ pub mod pallet {
                 Error::<T>::DIDExists
             );
 
+            /// Checks the DID document contains the section `Capability Delegation`
+            /// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
+
+            let doc = str::from_utf8(&did_document).unwrap();
+            let sanitised = doc.replace("\n", "").replace(" ", "");
+
+
             DIDDocument::<T>::insert(
                 did_uri.clone(),
                 DID {

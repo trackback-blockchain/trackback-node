@@ -52,7 +52,7 @@ Purge any existing dev chain state:
 Start a dev chain:
 
 ```bash
-./target/release/trackback-node--dev
+./target/release/trackback-node --dev
 ```
 
 Or, start a dev chain with detailed logging:
