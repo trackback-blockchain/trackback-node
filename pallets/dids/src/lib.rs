@@ -236,8 +236,8 @@ pub mod pallet {
             did_uri: Vec<u8>,
             did_resolution_metadata: Option<Vec<u8>>,
             did_document_metadata: Option<Vec<u8>>,
+            did_ref: Option<Vec<u8>>,
             public_keys: Option<Vec<Vec<u8>>>,
-            did_ref: Option<Vec<u8>>
         ) -> DispatchResultWithPostInfo {
             let _origin_account = ensure_signed(origin)?;
 
