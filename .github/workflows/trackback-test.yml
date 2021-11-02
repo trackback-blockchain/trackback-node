@@ -13,9 +13,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Clean
-        run: cargo update -p parity-db && cargo clean
+      - name: Install Rust Nightly
+        run:  |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+          source ~/.cargo/env
+          rustup default stable
+          rustup update
+          rustup update nightly
+          rustup target add wasm32-unknown-unknown --toolchain nightly
       - name: Build
-        run: cargo build --verbose
+        run: |
+          cargo update -p parity-db
+          cargo build
       - name: Run tests
         run:  cargo test --package pallet-dids --lib tests --verbose;
