@@ -20,7 +20,7 @@ jobs:
           rustup default stable
           rustup update
           rustup update nightly
-          rustup target add wasm32-unknown-unknown --toolchain nightly
+          rustup target add wasm32-unknown-unknown --toolchain nightly -y
       - name: Build
         run: |
           cargo update -p parity-db
