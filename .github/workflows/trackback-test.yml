@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Clean
-        run: cargo clean
+        run: cargo update -p parity-db && cargo clean
       - name: Build
         run: cargo build --verbose
       - name: Run tests
