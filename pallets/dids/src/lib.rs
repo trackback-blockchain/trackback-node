@@ -241,6 +241,11 @@ pub mod pallet {
         ) -> DispatchResultWithPostInfo {
             let _origin_account = ensure_signed(origin)?;
 
+            /// Checks the DID document contains the section `Capability Delegation`
+            /// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
+
+            // let doc = str::from_utf8(&did_document).unwrap();
+            // let sanitised = doc.replace("\n", "").replace(" ", "");
 
             DIDDocument::<T>::mutate(did_uri.clone(), |did| {
                 match did {
