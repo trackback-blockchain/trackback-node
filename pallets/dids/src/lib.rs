@@ -75,9 +75,10 @@ pub mod pallet {
     use frame_system::pallet_prelude::*;
 
     use crate::structs::{VerifiableCredential, DID};
-    use frame_support::traits::UnixTime;
     use sp_std::str;
     use sp_std::vec::Vec;
+    #[allow(dead_code)]
+    use frame_support::traits::UnixTime;
 
 
     #[pallet::config]
@@ -241,8 +242,8 @@ pub mod pallet {
         ) -> DispatchResultWithPostInfo {
             let _origin_account = ensure_signed(origin)?;
 
-            /// Checks the DID document contains the section `Capability Delegation`
-            /// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
+            // Checks the DID document contains the section `Capability Delegation`
+            // Reference :- https://www.w3.org/TR/did-core/#capability-delegation
 
             // let doc = str::from_utf8(&did_document).unwrap();
             // let sanitised = doc.replace("\n", "").replace(" ", "");
@@ -290,11 +291,11 @@ pub mod pallet {
                 Error::<T>::DIDExists
             );
 
-            /// Checks the DID document contains the section `Capability Delegation`
-            /// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
+            // Checks the DID document contains the section `Capability Delegation`
+            // Reference :- https://www.w3.org/TR/did-core/#capability-delegation
 
             let doc = str::from_utf8(&did_document).unwrap();
-            let sanitised = doc.replace("\n", "").replace(" ", "");
+            let _sanitised = doc.replace("\n", "").replace(" ", "");
 
 
             DIDDocument::<T>::insert(
