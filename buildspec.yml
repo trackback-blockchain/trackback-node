@@ -11,7 +11,7 @@ phases:
       - rustup default stable
       - rustup update
       - rustup update nightly
-      - rustup target add wasm32-unknown-unknown --toolchain nightly -y
+      - rustup target add wasm32-unknown-unknown --toolchain nightly
   build:
     commands:
       - cargo test --package pallet-dids --lib tests
