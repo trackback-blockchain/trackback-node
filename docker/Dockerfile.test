@@ -1,0 +1,8 @@
+# This is the build stage for Substrate. Here we create the binary.
+FROM docker.io/paritytech/ci-linux:production as builder
+
+WORKDIR /trackback-node
+COPY . /trackback-node
+RUN cargo build --locked --release
+
+
