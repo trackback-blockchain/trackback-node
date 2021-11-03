@@ -15,7 +15,9 @@ RUN cargo build --release --features $FEATURES
 
 
 FROM debian:buster-slim
-
+ARG RPC_PORT=9933
+ARG WEB_SOCKET_PORT=9944
+ARG P2P_PORT=30333
 ARG NODE_TYPE=trackback-node
 
 COPY ./LICENSE /build/LICENSE
@@ -28,7 +30,7 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /node node && \
 	rm -rf /usr/bin /usr/sbin
 
 USER node
-EXPOSE 30333 9933 9944
+EXPOSE ${RPC_PORT} ${P2P_PORT} ${WEB_SOCKET_PORT}
 VOLUME ["/data"]
 
 ENTRYPOINT ["/usr/local/bin/node-executable"]

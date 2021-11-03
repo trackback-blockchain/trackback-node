@@ -1,8 +1,11 @@
-# This is the build stage for Substrate. Here we create the binary.
-FROM docker.io/paritytech/ci-linux:production as builder
+FROM paritytech/ci-linux:production
 
-WORKDIR /trackback-node
-COPY . /trackback-node
-RUN cargo build --locked --release
+WORKDIR /var/www/trackback-node
 
+ADD . /var/www/trackback-node
 
+RUN rustup toolchain uninstall nightly
+RUN rustup toolchain install nightly-2020-08-23
+RUN rustup target add wasm32-unknown-unknown --toolchain nightly-2020-08-23
+
+CMD ["cargo", "test", " --package pallet-dids --lib tests"]

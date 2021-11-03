@@ -34,12 +34,11 @@ pub fn public_keys() -> Option<Vec<Vec<u8>>> {
 
 #[fixture]
 pub fn did_document_metadata() -> Option<Vec<u8>> {
-     Some(r#"{
+    Some(r#"{
         "created": "2002-01-01T20:20:20Z",
         "updated": "2002-02-01T20:20:20Z",
         "deactivated": "2002-03-01T20:20:20Z",
         "versionId": "1",
-
     }"#.as_bytes().to_vec())
 }
 
@@ -301,7 +300,7 @@ fn update_did(
                 None
                 )
             );
-        }
+    }
     );
 }
 
