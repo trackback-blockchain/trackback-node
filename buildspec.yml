@@ -41,12 +41,3 @@ phases:
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:${IMAGE_TAG}
     finally:
       - echo "pushed to ecr"
-
-artifacts:
-  files:
-    - target/release/trackback-node
-  discard-paths: "yes"
-
-cache:
-  paths:
-    - $HOME/.cargo/registry/**/*
