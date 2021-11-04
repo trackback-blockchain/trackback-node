@@ -19,6 +19,11 @@ phases:
       - rustup update
       - rustup update nightly
       - rustup target add wasm32-unknown-unknown --toolchain nightly
+      - apt-get update -y
+      - apt-get install -y docker.io
+      - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      - unzip awscliv2.zip
+      - ./aws/install --update
     finally:
       - echo "Installed dependencies"
   pre_build:
