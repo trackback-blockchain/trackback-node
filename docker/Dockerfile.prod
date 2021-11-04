@@ -30,6 +30,7 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /node node && \
 	rm -rf /usr/bin /usr/sbin
 
 USER node
+
 EXPOSE ${RPC_PORT} ${P2P_PORT} ${WEB_SOCKET_PORT}
 VOLUME ["/data"]
 
