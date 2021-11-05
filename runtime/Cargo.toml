@@ -2,7 +2,7 @@
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
 edition = '2018'
 homepage = 'https://substrate.dev'
-license = 'Unlicense'
+license = 'LGPL-3.0'
 name = 'trackback-node-runtime'
 repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
 version = '3.0.0'
