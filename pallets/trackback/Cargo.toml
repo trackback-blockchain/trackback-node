@@ -3,7 +3,7 @@ authors = ['Trackback']
 description = 'Custom Trackback FRAME pallet'
 edition = '2018'
 homepage = 'https://trackback.co.nz/'
-license = 'MIT'
+license = 'LGPL-3.0'
 name = 'pallet-trackback'
 repository = 'https://github.com/trackback-blockchain/trackback-pallet/'
 version = '3.0.0'
@@ -21,7 +21,7 @@ version = '2.0.0'
 [dependencies]
 frame-support = { default-features = false, version = '3.0.0' }
 frame-system = { default-features = false, version = '3.0.0' }
-sp-std = { default-features = false, version = '3.0.0' } 
+sp-std = { default-features = false, version = '3.0.0' }
 
 [dev-dependencies]
 serde = { version = "1.0.119" }

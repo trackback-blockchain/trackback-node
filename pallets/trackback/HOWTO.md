@@ -14,7 +14,7 @@ description = '<YOUR_PALLET_DESCRIPTION>'
 authors = ["<YOUR_NAME>"]
 edition = '2018'
 homepage = '<YOUR_HOMEPAGE>'
-license = 'Unlicense'
+license = 'LGPL-3.0'
 ```
 
 ## Updating Your Dependencies
