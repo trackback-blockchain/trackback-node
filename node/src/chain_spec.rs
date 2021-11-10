@@ -77,7 +77,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 }
 
 pub fn test_net_config() -> ChainSpec {
-    // ChainSpec::from_json_file(PathBuf::from("../chain_specs/test-net.json")).unwrap()
     ChainSpec::from_json_bytes(&include_bytes!("../chain_specs/staging-net.json")[..]).unwrap()
 }
 
@@ -98,6 +97,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                 vec![
                     authority_keys_from_seed("Alice"),
                     authority_keys_from_seed("Bob"),
+                    authority_keys_from_seed("TrackBack"),
                 ],
                 // Sudo account
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -109,12 +109,14 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Dave"),
                     get_account_id_from_seed::<sr25519::Public>("Eve"),
                     get_account_id_from_seed::<sr25519::Public>("Ferdie"),
+                    get_account_id_from_seed::<sr25519::Public>("TrackBack"),
                     get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+                    get_account_id_from_seed::<sr25519::Public>("TrackBack//stash"),
                 ],
                 true,
             )
@@ -179,7 +181,12 @@ fn testnet_genesis(
                     OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
                     endowed_accounts[1].clone()
                 ),
+                (
+                    OpaquePeerId(bs58::decode("12D3KooWB2Lp58fb9tFxVfnd9bTAMmegZQJH3RGroX2oTKL3egNE").into_vec().unwrap()),
+                    endowed_accounts[2].clone()
+                ),
             ],
+
         }),
 
     }
