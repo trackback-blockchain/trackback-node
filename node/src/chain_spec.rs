@@ -167,6 +167,8 @@ fn testnet_genesis(
             // Assign network admin rights.
             key: root_key,
         }),
+        // TODO: this configuration is only for MVP chain
+        // TODO: Change this for live net
         pallet_node_authorization: Some(NodeAuthorizationConfig {
             nodes: vec![
                 (
