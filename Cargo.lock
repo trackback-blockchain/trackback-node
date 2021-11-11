@@ -3919,7 +3919,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-trackback"
-version = "3.0.0"
+version = "0.0.1"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -7716,7 +7716,7 @@ dependencies = [
 
 [[package]]
 name = "trackback-node"
-version = "3.0.0"
+version = "0.0.1"
 dependencies = [
  "bs58",
  "frame-benchmarking",
@@ -7753,7 +7753,7 @@ dependencies = [
 
 [[package]]
 name = "trackback-node-runtime"
-version = "3.0.0"
+version = "0.0.1"
 dependencies = [
  "frame-benchmarking",
  "frame-executive",
