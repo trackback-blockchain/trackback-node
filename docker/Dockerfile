@@ -5,11 +5,11 @@ WORKDIR /build
 ARG FEATURES=default
 
 COPY ./.git/ /build/.git/
-COPY ./node /build/node
-COPY ./pallets /build/pallets
-COPY ./runtime /build/runtime
-COPY ./Cargo.lock /build/Cargo.lock
-COPY ./Cargo.toml /build/Cargo.toml
+COPY ../node /build/node
+COPY ../pallets /build/pallets
+COPY ../runtime /build/runtime
+COPY ../Cargo.lock /build/Cargo.lock
+COPY ../Cargo.toml /build/Cargo.toml
 
 RUN cargo build --release --features $FEATURES
 
@@ -20,7 +20,7 @@ ARG WEB_SOCKET_PORT=9944
 ARG P2P_PORT=30333
 ARG NODE_TYPE=trackback-node
 
-COPY ./LICENSE /build/LICENSE
+COPY ../LICENSE /build/LICENSE
 COPY --from=builder /build/target/release/$NODE_TYPE /usr/local/bin/node-executable
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /node node && \

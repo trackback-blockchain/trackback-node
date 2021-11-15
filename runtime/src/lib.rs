@@ -43,9 +43,6 @@ use pallet_transaction_payment::CurrencyAdapter;
 pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
-/// Import the template pallet.
-pub use pallet_trackback;
-
 /// Decentralised Identifiers pallet.
 pub use pallet_dids;
 /// An index to a block.
@@ -267,11 +264,6 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
-/// Configure the template pallet in pallets/template.
-impl pallet_trackback::Config for Runtime {
-    type Event = Event;
-}
-
 impl pallet_dids::Config for Runtime {
     type Event = Event;
     type TimeProvider = pallet_timestamp::Pallet<Runtime>;
@@ -310,7 +302,6 @@ construct_runtime!(
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
         NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
         // Include the custom logic from the template pallet in the runtime.
-        TrackbackModule: pallet_trackback::{Module, Call, Storage, Event<T>},
         DIDModule: pallet_dids::{Module, Call, Storage, Event<T>},
     }
 );
