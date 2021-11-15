@@ -20,7 +20,7 @@ ARG WEB_SOCKET_PORT=9944
 ARG P2P_PORT=30333
 ARG NODE_TYPE=trackback-node
 
-COPY ../LICENSE /build/LICENSE
+COPY ../LICENCE /build/LICENSE
 COPY --from=builder /build/target/release/$NODE_TYPE /usr/local/bin/node-executable
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /node node && \
