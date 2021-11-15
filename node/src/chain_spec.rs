@@ -77,7 +77,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 }
 
 pub fn test_net_config() -> ChainSpec {
-    // ChainSpec::from_json_file(PathBuf::from("../chain_specs/test-net.json")).unwrap()
     ChainSpec::from_json_bytes(&include_bytes!("../chain_specs/staging-net.json")[..]).unwrap()
 }
 

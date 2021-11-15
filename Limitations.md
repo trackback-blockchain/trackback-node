@@ -16,5 +16,3 @@
 * Provides support for Ledger based DIDs only. 
 * Does not cover Ledger Middleware DIDs, Peer DIDs, Static DIDs and Alternative DIDs
 * Tight bindings between a Controller and the Chain  limited to default accounts
-
-
