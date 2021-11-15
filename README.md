@@ -1,10 +1,9 @@
-
 <p>
   <a href="https://trackback.co.nz/">
     <img src="https://user-images.githubusercontent.com/2051324/127407635-236f8a7a-4ca6-410a-9fc4-add396743cfa.png" alt="TrackBack"></a>
 </p>
 
-Blockchain for decentralised identifiers and verifiable credentials.
+Blockchain for `Self Sovereign Identity`, `Decentralised Identifiers` and `Verifiable Credentials` .
 <br>
 <a href="https://github.com/paritytech/substrate/tree/v3.0.0" target="_blank">
     <img src="https://img.shields.io/badge/Substrate-3.0.0-green" alt="Substrate 3.0.0">
@@ -15,9 +14,16 @@ Blockchain for decentralised identifiers and verifiable credentials.
 <a href="https://github.com/paritytech/substrate/tree/v3.0.0" target="_blank">
     <img src="https://img.shields.io/badge/terraform-1.0.0-8ca" alt="Substrate 3.0.0">
 </a>
+<a>
+<img src="https://img.shields.io/badge/TrackBack--Node-0.0.1-00AAFF" alt="TrackBack-Node 0.0.1">
+</a>
+
 ## Features
-* DID Pallet
-* Verifiable Credential Pallet (Late 2021)
+* DID Pallet 
+* Verifiable Credentials Pallet (Q2-2021)
+
+# Limitations
+* [Limitations](Limitations.md)
 
 ## Setting up the chain
 * [Install](https://substrate.dev/docs/en/knowledgebase/getting-started/) substrate 
