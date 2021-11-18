@@ -19,6 +19,7 @@ ARG RPC_PORT=9933
 ARG WEB_SOCKET_PORT=9944
 ARG P2P_PORT=30333
 ARG NODE_TYPE=trackback-node
+ARG PROMETHEUS_PORT=9615
 
 COPY ./LICENCE /build/LICENCE
 COPY --from=builder /build/target/release/$NODE_TYPE /usr/local/bin/node-executable
@@ -31,7 +32,7 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /node node && \
 
 USER node
 
-EXPOSE ${RPC_PORT} ${P2P_PORT} ${WEB_SOCKET_PORT}
+EXPOSE ${RPC_PORT} ${P2P_PORT} ${WEB_SOCKET_PORT} ${PROMETHEUS_PORT}
 VOLUME ["/data"]
 
 ENTRYPOINT ["/usr/local/bin/node-executable"]
