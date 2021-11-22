@@ -7,6 +7,7 @@
 * Released for test purposes only
 
 ## Limitations in Minimum viable product ( These features will be available in future releases)
+* This release does not come with DID signature ( which tightly binds a DID with its controller)
 * No [token](https://docs.substrate.io/how-to-guides/v3/basics/mint-token/) economic models around managing Decentralised Identifiers
 * No staking rewards
 * Default configuration has 2 validators and a not well known node ( 3 node network )
