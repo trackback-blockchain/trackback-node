@@ -24,6 +24,9 @@ Blockchain for `Self Sovereign Identity`, `Decentralised Identifiers` and `Verif
 
 # Limitations
 * [Limitations](Limitations.md)
+* Releasing as a minimum viable product.
+* Not recommended to use in production.
+* Relesing with limited features (MVP)
 
 ## Setting up the chain
 * [Install](https://substrate.dev/docs/en/knowledgebase/getting-started/) substrate 
