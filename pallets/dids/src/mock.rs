@@ -1,5 +1,5 @@
 // This file is part of TrackBck which is released under GNU General Public License v3.0.
-// See file LICENCE.md or go to https://www.gnu.org/licenses/gpl-3.0.en.html for full license details.
+// See file LICENSE.md or go to https://www.gnu.org/licenses/gpl-3.0.en.html for full license details.
 use crate as pallet_dids;
 use frame_support::parameter_types;
 use frame_system as system;
