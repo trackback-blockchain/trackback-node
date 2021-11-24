@@ -1,11 +1,15 @@
-FROM paritytech/ci-linux:production
+FROM paritytech/ci-linux:105b919b-20210617 as builder
 
-WORKDIR /var/www/trackback-node
+WORKDIR /build
 
-ADD . /var/www/trackback-node
+ARG FEATURES=default
 
-RUN rustup toolchain uninstall nightly
-RUN rustup toolchain install nightly-2020-08-23
-RUN rustup target add wasm32-unknown-unknown --toolchain nightly-2020-08-23
+COPY ./.git/ /build/.git/
+COPY ./node /build/node
+COPY ./pallets /build/pallets
+COPY ./runtime /build/runtime
+COPY ./Cargo.lock /build/Cargo.lock
+COPY ./Cargo.toml /build/Cargo.toml
+COPY ./scripts/test.sh /build/test.sh
 
-CMD ["cargo", "test", " --package pallet-dids --lib tests"]
+CMD ["sh", "test.sh"]
