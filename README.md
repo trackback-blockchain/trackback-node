@@ -50,6 +50,57 @@ cargo build --release
 
 ## Run
 
+### Run as a permission network
+* Please [Follow](https://docs.substrate.io/tutorials/v3/permissioned-network/) the tutorial.
+* Docker configurations for 3 nodes in permissioned network.
+* Node 1
+```bash
+docker run -p 0.0.0.0:9615:9615 -p 0.0.0.0:30333:30333 -p 0.0.0.0:9933:9933 -p 0.0.0.0:9944:9944 -e RPC_PORT=9933 -e P2P_PORT=30333 -e WEB_SOCKET_PORT=9944 <DOCKER IMAGE NAME> \
+--chain=local \
+--base-path /tmp/validator1 \
+--alice \
+--node-key=<NODE KEY> \
+--port 30333 \
+--unsafe-ws-external \
+--rpc-methods Unsafe \
+--rpc-cors=all \
+--ws-external \
+--ws-port 9944
+  ```
+Node 2
+```bash
+docker run -p 0.0.0.0:30333:30333 -p 0.0.0.0:9933:9933 -p 0.0.0.0:9944:9944 -e RPC_PORT=9933 -e P2P_PORT=30333 -e WEB_SOCKET_PORT=9944 <DOCKER IMAGE NAME> \
+--chain=local \
+--base-path /tmp/validator2 \
+--bob \
+--node-key=<NODE KEY> \
+--port 30333 \
+--ws-port 9944 \
+--unsafe-ws-external \
+--rpc-methods Unsafe \
+--rpc-cors=all \
+--ws-external \
+--bootnodes /ip4/<IP4 ADDRESS>/tcp/30333/p2p/<BOOT-NODE-ADDRESS>
+```
+
+Node 3 ( Not well known node )
+```bash
+docker run -p 0.0.0.0:30333:30333 -p 0.0.0.0:9933:9933 -p 0.0.0.0:9944:9944 -e RPC_PORT=9933 -e P2P_PORT=30333 -e WEB_SOCKET_PORT=9944 <DOCKER IMAGE NAME> /tmp/validator3 \
+  --chain local \
+  --charlie \
+  --port 30333 \
+  --ws-port 9944 \
+  --rpc-port 9933 \
+  --rpc-methods Unsafe \
+  --unsafe-ws-external \
+  --rpc-cors=all \
+  --node-key=<NODE KEY> \ \
+  --ws-external \
+  --validator \
+  --offchain-worker always \
+  --bootnodes /ip4/<IP4 Addresss>/tcp/30333/p2p/<BOOT NODE KEY>
+```
+
 ### Single Node Development Chain
 
 Purge any existing dev chain state:

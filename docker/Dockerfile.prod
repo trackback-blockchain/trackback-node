@@ -21,7 +21,7 @@ ARG P2P_PORT=30333
 ARG NODE_TYPE=trackback-node
 ARG PROMETHEUS_PORT=9615
 
-COPY ./LICENCE /build/LICENCE
+COPY ./LICENSE /build/LICENSE
 COPY --from=builder /build/target/release/$NODE_TYPE /usr/local/bin/node-executable
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /node node && \
