@@ -23,7 +23,7 @@ jobs:
           DOCKER_HUB_USER_NAME: ${{ secrets.DOCKER_HUB_USER_NAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
-          docker login -U $DOCKER_HUB_USER_NAME -p $DOCKER_HUB_PASSWORD
+          docker login -u $DOCKER_HUB_USER_NAME -p $DOCKER_HUB_PASSWORD
       - name: Build
         run: |
           docker build -f ./docker/Dockerfile.prod -t trackbacklimited/trackbacknode .
