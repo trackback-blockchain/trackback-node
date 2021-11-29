@@ -7,6 +7,17 @@ use frame_support::codec::{Decode, Encode};
 use frame_system::Config;
 use sp_std::vec::Vec;
 
+/// Stores Signatures by DID Controllers
+/// A DID can have at least a controller
+#[derive(Clone, Decode, Encode, Eq, PartialEq)]
+pub struct Signature {
+	pub public_key: Option<Vec<u8>>,
+	pub proof: Option<Vec<u8>>,
+	pub active: Option<bool>,
+	pub created_time_stamp: Option<u64>,
+	pub updated_timestamp: Option<u64>,
+}
+
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
 pub struct DIDDetail<T: Config> {
 	// Tracking number of issued DIDs  by the controller
@@ -55,8 +66,16 @@ pub struct VerifiableCredential<T: Config> {
 	pub active: Option<bool>,
 }
 
+/// Defaults for VerifiableCredentials
 impl<T: Config> Default for VerifiableCredential<T> {
 	fn default() -> Self {
 		Self { account_id: None, public_key: Vec::new(), block_time_stamp: 0, active: Some(false) }
+	}
+}
+
+/// Defaults for Signature
+impl<T: Config> Default for Signature{
+	fn default() -> Self {
+		Self { public_key: None, proof: None, active: None, created_time_stamp: None, updated_timestamp: None}
 	}
 }

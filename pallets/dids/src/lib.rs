@@ -76,7 +76,7 @@ pub mod pallet {
 
 	use frame_system::pallet_prelude::*;
 
-	use crate::structs::{VerifiableCredential, DID};
+	use crate::structs::{VerifiableCredential, DID, Signature};
 	#[allow(dead_code)]
 	use frame_support::traits::UnixTime;
 	use sp_std::{str, vec::Vec};
@@ -97,6 +97,12 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn get_did_document)]
 	pub(super) type DIDDocument<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, DID<T>>;
+
+	/// Stores Signatures for DIDs
+	/// This ensures tight bindings with its controller
+	#[pallet::storage]
+	#[pallet::getter(fn get_signature)]
+	pub(super) type DIDSignature<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, Vec<Signature>>;
 
 	/// Accounts associated with a DID
 	#[pallet::storage]
@@ -235,6 +241,16 @@ pub mod pallet {
 			//TODO:  Checks the DID document contains the section `Capability Delegation`
 			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
 
+			DIDSignature::<T>::mutate(did_uri.clone(), | did_signature | match did_signature{
+				| None => {
+					let p = 0;
+				},
+				| Some(s) => {
+
+					ok(())
+				}
+			});
+
 			DIDDocument::<T>::mutate(did_uri.clone(), |did| match did {
 				| None => return Err(Error::<T>::DIDDoesNotExists),
 				| Some(d) => {
@@ -262,6 +278,7 @@ pub mod pallet {
 			did_uri: Vec<u8>,
 			did_ref: Option<Vec<u8>>,
 			public_keys: Option<Vec<Vec<u8>>>,
+			signature: Option<Signature>,
 		) -> DispatchResultWithPostInfo {
 			let origin_account = ensure_signed(origin)?;
 
@@ -271,11 +288,28 @@ pub mod pallet {
 
 			ensure!(!DIDDocument::<T>::contains_key(&did_uri), Error::<T>::DIDExists);
 
+			// New DID Document can have a signature
+			let mut signatures: Vec<Option<Signature>> = Vec::new();
+			signatures.push(signature);
+
 			//TODO: Checks the DID document contains the section `Capability Delegation`
 			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
 
 			let doc = str::from_utf8(&did_document).unwrap();
 			let _sanitised = doc.replace("\n", "").replace(" ", "");
+
+			// DIDSignature::<T>::mutate(did_uri.clone(), | did_signature | match did_signature{
+			// 	| None => {
+			// 		let p = 0;
+			// 	},
+			// 	| Some(s) => {
+			//
+			// 		ok(())
+			// 	}
+			// });
+
+			// Inserts new set of signatures.
+			DIDSignature::<T>::insert(did_uri.clone(), signatures);
 
 			DIDDocument::<T>::insert(
 				did_uri.clone(),
@@ -287,7 +321,7 @@ pub mod pallet {
 					updated_timestamp: time,
 					did_ref,
 					sender_account_id,
-					public_keys,
+					public_keys
 				},
 			);
 
