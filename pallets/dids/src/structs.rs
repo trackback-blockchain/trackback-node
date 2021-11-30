@@ -9,13 +9,13 @@ use sp_std::vec::Vec;
 
 /// Stores Signatures by DID Controllers
 /// A DID can have at least a controller
-#[derive(Clone, Decode, Encode, Eq, PartialEq)]
+#[derive(Clone, Decode, Encode, Eq, PartialEq, Debug)]
 pub struct Signature {
 	pub public_key: Option<Vec<u8>>,
 	pub proof: Option<Vec<u8>>,
 	pub active: Option<bool>,
-	pub created_time_stamp: Option<u64>,
-	pub updated_timestamp: Option<u64>,
+	pub created_time_stamp: u64,
+	pub updated_timestamp: u64,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
@@ -74,8 +74,8 @@ impl<T: Config> Default for VerifiableCredential<T> {
 }
 
 /// Defaults for Signature
-impl<T: Config> Default for Signature{
+impl Default for Signature{
 	fn default() -> Self {
-		Self { public_key: None, proof: None, active: None, created_time_stamp: None, updated_timestamp: None}
+		Self { public_key: None, proof: None, active: None, created_time_stamp: 0, updated_timestamp: 0}
 	}
 }

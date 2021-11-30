@@ -241,15 +241,15 @@ pub mod pallet {
 			//TODO:  Checks the DID document contains the section `Capability Delegation`
 			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
 
-			DIDSignature::<T>::mutate(did_uri.clone(), | did_signature | match did_signature{
-				| None => {
-					let p = 0;
-				},
-				| Some(s) => {
-
-					ok(())
-				}
-			});
+			// DIDSignature::<T>::mutate(did_uri.clone(), | did_signature | match did_signature{
+			// 	| None => {
+			// 		let p = 0;
+			// 	},
+			// 	| Some(s) => {
+			//
+			// 		ok(())
+			// 	}
+			// });
 
 			DIDDocument::<T>::mutate(did_uri.clone(), |did| match did {
 				| None => return Err(Error::<T>::DIDDoesNotExists),
@@ -278,7 +278,7 @@ pub mod pallet {
 			did_uri: Vec<u8>,
 			did_ref: Option<Vec<u8>>,
 			public_keys: Option<Vec<Vec<u8>>>,
-			signature: Option<Signature>,
+			mut signatures: Vec<Signature>
 		) -> DispatchResultWithPostInfo {
 			let origin_account = ensure_signed(origin)?;
 
@@ -288,9 +288,10 @@ pub mod pallet {
 
 			ensure!(!DIDDocument::<T>::contains_key(&did_uri), Error::<T>::DIDExists);
 
-			// New DID Document can have a signature
-			let mut signatures: Vec<Option<Signature>> = Vec::new();
-			signatures.push(signature);
+			for i in 0..signatures.len() {
+				signatures[i].created_time_stamp = time.clone();
+				signatures[i].updated_timestamp = time.clone();
+			}
 
 			//TODO: Checks the DID document contains the section `Capability Delegation`
 			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
@@ -298,17 +299,9 @@ pub mod pallet {
 			let doc = str::from_utf8(&did_document).unwrap();
 			let _sanitised = doc.replace("\n", "").replace(" ", "");
 
-			// DIDSignature::<T>::mutate(did_uri.clone(), | did_signature | match did_signature{
-			// 	| None => {
-			// 		let p = 0;
-			// 	},
-			// 	| Some(s) => {
-			//
-			// 		ok(())
-			// 	}
-			// });
-
 			// Inserts new set of signatures.
+			// DID URI can have one or more signatures
+			// This should decide by the controller
 			DIDSignature::<T>::insert(did_uri.clone(), signatures);
 
 			DIDDocument::<T>::insert(
