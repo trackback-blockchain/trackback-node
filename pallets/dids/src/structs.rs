@@ -14,7 +14,6 @@ use sp_core::ed25519::Signature;
 pub struct DIDSignature  {
 	pub public_key: Vec<u8>,
 	pub proof: Signature,
-	// pub proof:Vec<u8>,
 	pub active: bool,
 	pub created_time_stamp: u64,
 	pub updated_timestamp: u64,

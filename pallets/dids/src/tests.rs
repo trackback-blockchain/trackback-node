@@ -10,12 +10,9 @@ use frame_support::{
 };
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use sp_core::Blake2Hasher;
-// use libp2p::identity::{ed25519};
 use crate::structs::DIDSignature;
-// use libp2p::core::identity::ed25519::{Keypair};
 use sp_core::ed25519::Pair as KeyPair;
 use sp_core::ed25519;
-// use frame_support::sp_runtime::app_crypto::Pair;
 use codec::Encode;
 use frame_support::sp_runtime::app_crypto::Pair;
 
@@ -115,6 +112,7 @@ pub fn did_uri(did_document: &'static str) -> Vec<u8> {
 	Blake2Hasher::hash(did_document.as_ref()).as_bytes().to_vec()
 }
 
+/// Vec<u8> representation of a publicKey
 #[fixture]
 pub fn public_key() -> Vec<u8> {
 	vec![
@@ -162,6 +160,8 @@ fn create_vc_exists(public_key: Vec<u8>, vc_hash: Vec<u8>) {
 	});
 }
 
+/// Creates a DID with Valid Signature
+/// Single Controller for a DID Document
 #[rstest]
 fn create_did(
 	did_document_metadata: Option<Vec<u8>>,
@@ -185,6 +185,44 @@ fn create_did(
 			public_keys,
 			signature
 		));
+	});
+}
+
+/// Creates a DID Document, the proof is not matching with the signed private key of the controller
+#[rstest]
+#[case(ed25519::Pair::generate().0,5,"DIDProofVerificationFailed")]
+fn creates_a_did_with_invalid_signature(
+	#[case] key_pair: KeyPair,
+	#[case] error_num: u8,
+	#[case] message: &'static str,
+	did_document_metadata: Option<Vec<u8>>,
+	did_resolution_metadata: Option<Vec<u8>>,
+	did_document: &'static str,
+	did_uri: Vec<u8>,
+	did_ref: Option<Vec<u8>>,
+	public_key: Vec<u8>,
+	public_keys: Option<Vec<Vec<u8>>>,
+	mut signature: Vec<DIDSignature>
+) {
+
+	// Signed with a new Keypair
+	let signed = key_pair.sign(&*did_document.as_bytes().to_vec());
+	signature[0].proof = signed;
+
+	new_test_ext().execute_with(|| {
+		assert_err!(
+			DIDModule::insert_did_document(
+			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
+			did_document_metadata,
+			did_resolution_metadata,
+			public_key,
+			did_uri,
+			did_ref,
+			public_keys,
+			signature
+		)
+		,DispatchError::Module { index: 1, error: error_num, message: Some(message) });
 	});
 }
 

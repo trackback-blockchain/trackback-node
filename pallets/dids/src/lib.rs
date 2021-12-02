@@ -302,16 +302,18 @@ pub mod pallet {
 				signatures[i].updated_timestamp = time.clone();
 
 				let proof = signatures[i].clone().proof;
-				let public_key = ed25519::Public::try_from(&*(signatures[i].clone().public_key)).unwrap();
+				let public_key = ed25519::Public::try_from(
+					&*(signatures[i].clone().public_key)
+				).unwrap();
 
 				let did_signature: Proof = Proof::from_slice(proof.as_ref());
 				let verified =public_key.verify(&did_document, &did_signature);
-
-				ensure!(verified, Error::<T>::DIDProofVerificationFailed);
+				//Check Signatures with public keys
+				if !verified {
+					ensure!(verified, Error::<T>::DIDProofVerificationFailed);
+					break;
+				}
 			}
-
-
-			//Check Signatures with public keys
 
 			//TODO: Checks the DID document contains the section `Capability Delegation`
 			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation

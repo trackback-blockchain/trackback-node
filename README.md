@@ -25,6 +25,9 @@ Blockchain for `Self Sovereign Identity`, `Decentralised Identifiers` and `Verif
 * DID Pallet 
 * Verifiable Credentials Pallet (Q2-2021)
 
+## Important
+* Please read [TrackBack DID Readme](pallets/dids/README.md)
+
 # Limitations
 * [Limitations](Limitations.md)
 * Releasing as a minimum viable product.
