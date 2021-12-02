@@ -168,6 +168,9 @@ pub mod pallet {
 
 		/// Verifiable credential exists
 		VerifiableCredentialExists,
+
+		/// DID Proof mismatched with the controller
+		DIDProofVerificationFailed,
 	}
 
 	/// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
@@ -299,19 +302,12 @@ pub mod pallet {
 				signatures[i].updated_timestamp = time.clone();
 
 				let proof = signatures[i].clone().proof;
-				// let public_key = signatures[i].clone().public_key;
-				let mut public_key = ed25519::Public::try_from(&*(signatures[i].clone().public_key)).unwrap();
+				let public_key = ed25519::Public::try_from(&*(signatures[i].clone().public_key)).unwrap();
 
-				// let msg = Blake2_128Concat::(&*did_document);
+				let did_signature: Proof = Proof::from_slice(proof.as_ref());
+				let verified =public_key.verify(&did_document, &did_signature);
 
-				let s = Proof::from_slice(proof.as_ref());
-				let sig = Proof::from_slice(&proof);
-				// ::try_from(proof).unwrap();
-				let p = public_key.verify(&did_document, &s);
-
-
-				let x = 100;
-					//PublicKey::from_bytes(signatures[i].clone().public_key.as_ref());
+				ensure!(verified, Error::<T>::DIDProofVerificationFailed);
 			}
 
 

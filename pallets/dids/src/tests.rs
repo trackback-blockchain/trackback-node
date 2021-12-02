@@ -6,27 +6,19 @@ use rstest::*;
 
 use crate::mock::DIDModule;
 use frame_support::{
-	assert_err, assert_ok, pallet_prelude::DispatchError, sp_runtime::app_crypto::sp_core::Hasher,
+	 assert_ok,assert_err, sp_runtime::app_crypto::sp_core::Hasher, pallet_prelude::DispatchError
 };
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
-use sp_core::{Blake2Hasher, blake2_128};
-use libp2p::identity::{ed25519, PublicKey};
+use sp_core::{Blake2Hasher};
+use libp2p::identity::{ed25519};
 use crate::structs::Signature;
-use libp2p::core::identity::ed25519::{Keypair, SecretKey};
-use libp2p::PeerId;
-
+use libp2p::core::identity::ed25519::{Keypair};
 
 
 /// Fixture to generate a keypair, secret and a peerId
 #[fixture]
 pub fn key_pair() -> Keypair {
 	ed25519::Keypair::generate()
-	// let secret = keypair.secret();
-	// let peer_id = PublicKey::Ed25519(keypair.public()).to_peer_id();
-	//
-	// let msg = "msg";
-
-	// (keypair, secret, peer_id)
 }
 
 
@@ -34,17 +26,12 @@ pub fn key_pair() -> Keypair {
 /// This performs by the Controller or the Issuer
 #[fixture]
 pub fn signature(key_pair: Keypair, did_document: &'static str) -> Vec<Signature>{
-	// private key
-	let private_key = key_pair.clone().secret();
 
 	// public key
 	let public_key = key_pair.clone().public();
 
 	// Converts a public key in to byte array
-
 	let public_key_to_bytes = public_key.encode();
-	// Hash
-	// let hash = blake2_128(&*did_document.as_bytes().to_vec());
 
 	// Digital Signature
 	let signed = key_pair.sign(&*did_document.as_bytes().to_vec());
@@ -136,39 +123,39 @@ pub fn vc_hash() -> Vec<u8> {
 	"Hash".as_bytes().to_vec()
 }
 
-// #[rstest]
-// fn create_vc(public_key: Vec<u8>, vc_hash: Vec<u8>) {
-// 	new_test_ext().execute_with(|| {
-// 		assert_ok!(DIDModule::create_vc_fingerprint(
-// 			Origin::signed(1),
-// 			public_key,
-// 			vc_hash,
-// 			Some(true)
-// 		));
-// 	});
-// }
-//
-// #[rstest]
-// fn create_vc_exists(public_key: Vec<u8>, vc_hash: Vec<u8>) {
-// 	new_test_ext().execute_with(|| {
-// 		DIDModule::create_vc_fingerprint(
-// 			Origin::signed(1),
-// 			public_key.clone(),
-// 			vc_hash.clone(),
-// 			Some(true),
-// 		)
-// 		.ok();
-//
-// 		assert_err!(
-// 			DIDModule::create_vc_fingerprint(Origin::signed(1), public_key, vc_hash, Some(true)),
-// 			DispatchError::Module {
-// 				index: 1,
-// 				error: 4,
-// 				message: Some("VerifiableCredentialExists")
-// 			}
-// 		);
-// 	});
-// }
+#[rstest]
+fn create_vc(public_key: Vec<u8>, vc_hash: Vec<u8>) {
+	new_test_ext().execute_with(|| {
+		assert_ok!(DIDModule::create_vc_fingerprint(
+			Origin::signed(1),
+			public_key,
+			vc_hash,
+			Some(true)
+		));
+	});
+}
+
+#[rstest]
+fn create_vc_exists(public_key: Vec<u8>, vc_hash: Vec<u8>) {
+	new_test_ext().execute_with(|| {
+		DIDModule::create_vc_fingerprint(
+			Origin::signed(1),
+			public_key.clone(),
+			vc_hash.clone(),
+			Some(true),
+		)
+		.ok();
+
+		assert_err!(
+			DIDModule::create_vc_fingerprint(Origin::signed(1), public_key, vc_hash, Some(true)),
+			DispatchError::Module {
+				index: 1,
+				error: 4,
+				message: Some("VerifiableCredentialExists")
+			}
+		);
+	});
+}
 
 #[rstest]
 fn create_did(
@@ -196,176 +183,186 @@ fn create_did(
 	});
 }
 
-// #[rstest]
-// fn create_an_existing_did(
-// 	did_document_metadata: Option<Vec<u8>>,
-// 	did_resolution_metadata: Option<Vec<u8>>,
-// 	did_document: &'static str,
-// 	did_uri: Vec<u8>,
-// 	did_ref: Option<Vec<u8>>,
-// 	public_key: Vec<u8>,
-// 	public_keys: Option<Vec<Vec<u8>>>,
-// ) {
-// 	new_test_ext().execute_with(|| {
-// 		DIDModule::insert_did_document(
-// 			Origin::signed(1),
-// 			did_document.as_bytes().to_vec(),
-// 			did_document_metadata.clone(),
-// 			did_resolution_metadata.clone(),
-// 			public_key.clone(),
-// 			did_uri.clone(),
-// 			did_ref.clone(),
-// 			public_keys.clone(),
-// 		)
-// 		.ok();
-//
-// 		assert_err!(
-// 			DIDModule::insert_did_document(
-// 				Origin::signed(1),
-// 				did_document.as_bytes().to_vec(),
-// 				did_document_metadata,
-// 				did_resolution_metadata,
-// 				public_key,
-// 				did_uri.clone(),
-// 				did_ref,
-// 				public_keys.clone()
-// 			),
-// 			DispatchError::Module { index: 1, error: 0, message: Some("DIDExists") }
-// 		);
-// 	});
-// }
-//
-// #[rstest]
-// fn revoke_a_did(
-// 	did_document_metadata: Option<Vec<u8>>,
-// 	did_resolution_metadata: Option<Vec<u8>>,
-// 	did_document: &'static str,
-// 	did_uri: Vec<u8>,
-// 	public_key: Vec<u8>,
-// 	did_ref: Option<Vec<u8>>,
-// 	public_keys: Option<Vec<Vec<u8>>>,
-// ) {
-// 	new_test_ext().execute_with(|| {
-// 		DIDModule::insert_did_document(
-// 			Origin::signed(1),
-// 			did_document.as_bytes().to_vec(),
-// 			did_document_metadata.clone(),
-// 			did_resolution_metadata.clone(),
-// 			public_key,
-// 			did_uri.clone(),
-// 			did_ref,
-// 			public_keys,
-// 		)
-// 		.ok();
-//
-// 		assert_ok!(DIDModule::revoke_did(Origin::signed(1), did_uri));
-// 	});
-// }
-//
-// #[rstest]
-// fn revoke_non_existing_did(
-// 	did_document_metadata: Option<Vec<u8>>,
-// 	did_resolution_metadata: Option<Vec<u8>>,
-// 	did_document: &'static str,
-// 	did_uri: Vec<u8>,
-// 	public_key: Vec<u8>,
-// 	did_ref: Option<Vec<u8>>,
-// 	public_keys: Option<Vec<Vec<u8>>>,
-// ) {
-// 	new_test_ext().execute_with(|| {
-// 		DIDModule::insert_did_document(
-// 			Origin::signed(1),
-// 			did_document.as_bytes().to_vec(),
-// 			did_document_metadata.clone(),
-// 			did_resolution_metadata.clone(),
-// 			public_key,
-// 			did_uri.clone(),
-// 			did_ref,
-// 			public_keys,
-// 		)
-// 		.ok();
-//
-// 		DIDModule::revoke_did(Origin::signed(1), did_uri.clone()).ok();
-// 	});
-// }
-//
-// #[rstest]
-// fn revoke_a_revoked_did(did_uri: Vec<u8>) {
-// 	new_test_ext().execute_with(|| {
-// 		assert_err!(
-// 			DIDModule::revoke_did(Origin::signed(1), did_uri),
-// 			DispatchError::Module { index: 1, error: 1, message: Some("DIDDoesNotExists") }
-// 		);
-// 	});
-// }
-//
-// #[rstest]
-// fn update_did(
-// 	did_document_metadata: Option<Vec<u8>>,
-// 	did_resolution_metadata: Option<Vec<u8>>,
-// 	did_document: &'static str,
-// 	did_uri: Vec<u8>,
-// 	public_key: Vec<u8>,
-// 	did_ref: Option<Vec<u8>>,
-// 	public_keys: Option<Vec<Vec<u8>>>,
-// ) {
-// 	new_test_ext().execute_with(|| {
-// 		DIDModule::insert_did_document(
-// 			Origin::signed(1),
-// 			did_document.as_bytes().to_vec(),
-// 			did_document_metadata.clone(),
-// 			did_resolution_metadata.clone(),
-// 			public_key,
-// 			did_uri.clone(),
-// 			did_ref.clone(),
-// 			public_keys,
-// 		)
-// 		.ok();
-// 		assert_ok!(DIDModule::update_did(
-// 			Origin::signed(1),
-// 			did_uri.clone(),
-// 			did_resolution_metadata,
-// 			did_document_metadata,
-// 			None,
-// 			None
-// 		));
-// 	});
-// }
-//
-// #[rstest]
-// fn update_non_exsited_did(
-// 	did_document_metadata: Option<Vec<u8>>,
-// 	did_resolution_metadata: Option<Vec<u8>>,
-// 	did_document: &'static str,
-// 	did_uri: Vec<u8>,
-// 	public_key: Vec<u8>,
-// 	did_ref: Option<Vec<u8>>,
-// 	public_keys: Option<Vec<Vec<u8>>>,
-// ) {
-// 	let non_existed_did_uri = Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
-// 	new_test_ext().execute_with(|| {
-// 		DIDModule::insert_did_document(
-// 			Origin::signed(1),
-// 			did_document.as_bytes().to_vec(),
-// 			did_document_metadata.clone(),
-// 			did_resolution_metadata.clone(),
-// 			public_key,
-// 			did_uri.clone(),
-// 			did_ref,
-// 			public_keys,
-// 		)
-// 		.ok();
-//
-// 		assert_err!(
-// 			DIDModule::update_did(
-// 				Origin::signed(1),
-// 				non_existed_did_uri,
-// 				did_resolution_metadata,
-// 				did_document_metadata,
-// 				None,
-// 				None,
-// 			),
-// 			DispatchError::Module { index: 1, error: 1, message: Some("DIDDoesNotExists") }
-// 		);
-// 	});
-// }
+#[rstest]
+fn create_an_existing_did(
+	did_document_metadata: Option<Vec<u8>>,
+	did_resolution_metadata: Option<Vec<u8>>,
+	did_document: &'static str,
+	did_uri: Vec<u8>,
+	did_ref: Option<Vec<u8>>,
+	public_key: Vec<u8>,
+	public_keys: Option<Vec<Vec<u8>>>,
+	signature: Vec<Signature>
+) {
+	new_test_ext().execute_with(|| {
+		DIDModule::insert_did_document(
+			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
+			did_document_metadata.clone(),
+			did_resolution_metadata.clone(),
+			public_key.clone(),
+			did_uri.clone(),
+			did_ref.clone(),
+			public_keys.clone(),
+			signature.clone()
+		).ok();
+
+		assert_err!(
+			DIDModule::insert_did_document(
+				Origin::signed(1),
+				did_document.as_bytes().to_vec(),
+				did_document_metadata,
+				did_resolution_metadata,
+				public_key,
+				did_uri.clone(),
+				did_ref,
+				public_keys,
+				signature
+			),
+			DispatchError::Module { index: 1, error: 0, message: Some("DIDExists") }
+		);
+	});
+}
+
+#[rstest]
+fn revoke_a_did(
+	did_document_metadata: Option<Vec<u8>>,
+	did_resolution_metadata: Option<Vec<u8>>,
+	did_document: &'static str,
+	did_uri: Vec<u8>,
+	public_key: Vec<u8>,
+	did_ref: Option<Vec<u8>>,
+	public_keys: Option<Vec<Vec<u8>>>,
+	signature: Vec<Signature>
+) {
+	new_test_ext().execute_with(|| {
+		DIDModule::insert_did_document(
+			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
+			did_document_metadata.clone(),
+			did_resolution_metadata.clone(),
+			public_key,
+			did_uri.clone(),
+			did_ref,
+			public_keys,
+			signature
+		)
+		.ok();
+
+		assert_ok!(DIDModule::revoke_did(Origin::signed(1), did_uri));
+	});
+}
+
+#[rstest]
+fn revoke_non_existing_did(
+	did_document_metadata: Option<Vec<u8>>,
+	did_resolution_metadata: Option<Vec<u8>>,
+	did_document: &'static str,
+	did_uri: Vec<u8>,
+	public_key: Vec<u8>,
+	did_ref: Option<Vec<u8>>,
+	public_keys: Option<Vec<Vec<u8>>>,
+	signature: Vec<Signature>
+) {
+	new_test_ext().execute_with(|| {
+		DIDModule::insert_did_document(
+			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
+			did_document_metadata.clone(),
+			did_resolution_metadata.clone(),
+			public_key,
+			did_uri.clone(),
+			did_ref,
+			public_keys,
+			signature
+		)
+		.ok();
+
+		DIDModule::revoke_did(Origin::signed(1), did_uri.clone()).ok();
+	});
+}
+
+#[rstest]
+fn revoke_a_revoked_did(did_uri: Vec<u8>) {
+	new_test_ext().execute_with(|| {
+		assert_err!(
+			DIDModule::revoke_did(Origin::signed(1), did_uri),
+			DispatchError::Module { index: 1, error: 1, message: Some("DIDDoesNotExists") }
+		);
+	});
+}
+
+#[rstest]
+fn update_did(
+	did_document_metadata: Option<Vec<u8>>,
+	did_resolution_metadata: Option<Vec<u8>>,
+	did_document: &'static str,
+	did_uri: Vec<u8>,
+	public_key: Vec<u8>,
+	did_ref: Option<Vec<u8>>,
+	public_keys: Option<Vec<Vec<u8>>>,
+	signature: Vec<Signature>
+) {
+	new_test_ext().execute_with(|| {
+		DIDModule::insert_did_document(
+			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
+			did_document_metadata.clone(),
+			did_resolution_metadata.clone(),
+			public_key,
+			did_uri.clone(),
+			did_ref.clone(),
+			public_keys,
+			signature
+		)
+		.ok();
+		assert_ok!(DIDModule::update_did(
+			Origin::signed(1),
+			did_uri.clone(),
+			did_resolution_metadata,
+			did_document_metadata,
+			None,
+			None
+		));
+	});
+}
+
+#[rstest]
+fn update_non_exsited_did(
+	did_document_metadata: Option<Vec<u8>>,
+	did_resolution_metadata: Option<Vec<u8>>,
+	did_document: &'static str,
+	did_uri: Vec<u8>,
+	public_key: Vec<u8>,
+	did_ref: Option<Vec<u8>>,
+	public_keys: Option<Vec<Vec<u8>>>,
+	signature: Vec<Signature>
+) {
+	let non_existed_did_uri = Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
+	new_test_ext().execute_with(|| {
+		DIDModule::insert_did_document(
+			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
+			did_document_metadata.clone(),
+			did_resolution_metadata.clone(),
+			public_key,
+			did_uri.clone(),
+			did_ref,
+			public_keys,
+			signature
+		)
+		.ok();
+
+		assert_err!(
+			DIDModule::update_did(
+				Origin::signed(1),
+				non_existed_did_uri,
+				did_resolution_metadata,
+				did_document_metadata,
+				None,
+				None,
+			),
+			DispatchError::Module { index: 1, error: 1, message: Some("DIDDoesNotExists") }
+		);
+	});
+}
