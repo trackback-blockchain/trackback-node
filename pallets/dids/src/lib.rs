@@ -76,7 +76,7 @@ pub mod pallet {
 
 	use frame_system::pallet_prelude::*;
 
-	use crate::structs::{VerifiableCredential, DID, Signature};
+	use crate::structs::{VerifiableCredential, DID, DIDSignature};
 	#[allow(dead_code)]
 	use frame_support::traits::UnixTime;
 	use sp_core::{ed25519};
@@ -108,7 +108,7 @@ pub mod pallet {
 	/// This ensures tight bindings with its controller
 	#[pallet::storage]
 	#[pallet::getter(fn get_signature)]
-	pub(super) type DIDSignature<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, Vec<Signature>>;
+	pub(super) type DIDProof<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, Vec<DIDSignature>>;
 
 	/// Accounts associated with a DID
 	#[pallet::storage]
@@ -287,7 +287,7 @@ pub mod pallet {
 			did_uri: Vec<u8>,
 			did_ref: Option<Vec<u8>>,
 			public_keys: Option<Vec<Vec<u8>>>,
-			mut signatures: Vec<Signature>
+			mut signatures: Vec<DIDSignature>
 		) -> DispatchResultWithPostInfo {
 			let origin_account = ensure_signed(origin)?;
 
@@ -322,7 +322,7 @@ pub mod pallet {
 			// Inserts new set of signatures.
 			// DID URI can have one or more signatures
 			// This should decide by the controller
-			DIDSignature::<T>::insert(did_uri.clone(), signatures);
+			DIDProof::<T>::insert(did_uri.clone(), signatures);
 
 			DIDDocument::<T>::insert(
 				did_uri.clone(),
