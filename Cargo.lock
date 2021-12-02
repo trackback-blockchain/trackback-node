@@ -4629,6 +4629,7 @@ dependencies = [
  "rand 0.8.4",
  "rstest",
  "serde",
+ "sp-application-crypto",
  "sp-core",
  "sp-io",
  "sp-runtime",

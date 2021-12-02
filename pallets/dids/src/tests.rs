@@ -34,7 +34,6 @@ pub fn key_pair() -> Keypair {
 /// This performs by the Controller or the Issuer
 #[fixture]
 pub fn signature(key_pair: Keypair, did_document: &'static str) -> Vec<Signature>{
-	let v = key_pair.clone();
 	// private key
 	let private_key = key_pair.clone().secret();
 
@@ -42,18 +41,19 @@ pub fn signature(key_pair: Keypair, did_document: &'static str) -> Vec<Signature
 	let public_key = key_pair.clone().public();
 
 	// Converts a public key in to byte array
-	let publi_key_to_bytes = public_key.encode();
+
+	let public_key_to_bytes = public_key.encode();
 	// Hash
-	let hash = blake2_128(&*did_document.as_bytes().to_vec());
+	// let hash = blake2_128(&*did_document.as_bytes().to_vec());
 
 	// Digital Signature
-	let signed = key_pair.sign(&hash);
+	let signed = key_pair.sign(&*did_document.as_bytes().to_vec());
 
 	let mut signatures:Vec<Signature> = Vec::new();
 	signatures.push(	Signature{
-		public_key: Some(Vec::from(publi_key_to_bytes)),
-		proof: Some(signed),
-		active: Some(true),
+		public_key: Vec::from(public_key_to_bytes),
+		proof: signed,
+		active: true,
 		created_time_stamp: 0,
 		updated_timestamp: 0
 	});

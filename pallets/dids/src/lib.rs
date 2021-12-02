@@ -79,7 +79,13 @@ pub mod pallet {
 	use crate::structs::{VerifiableCredential, DID, Signature};
 	#[allow(dead_code)]
 	use frame_support::traits::UnixTime;
+	use sp_core::{ed25519};
 	use sp_std::{str, vec::Vec};
+	use sp_runtime::sp_std::convert::TryFrom;
+
+	use frame_support::sp_runtime::app_crypto::RuntimePublic;
+	use sp_core::ed25519::Signature as Proof;
+	// use sp_application_crypto::ed25519::Signature as Proof;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config + pallet_timestamp::Config {
@@ -291,7 +297,25 @@ pub mod pallet {
 			for i in 0..signatures.len() {
 				signatures[i].created_time_stamp = time.clone();
 				signatures[i].updated_timestamp = time.clone();
+
+				let proof = signatures[i].clone().proof;
+				// let public_key = signatures[i].clone().public_key;
+				let mut public_key = ed25519::Public::try_from(&*(signatures[i].clone().public_key)).unwrap();
+
+				// let msg = Blake2_128Concat::(&*did_document);
+
+				let s = Proof::from_slice(proof.as_ref());
+				let sig = Proof::from_slice(&proof);
+				// ::try_from(proof).unwrap();
+				let p = public_key.verify(&did_document, &s);
+
+
+				let x = 100;
+					//PublicKey::from_bytes(signatures[i].clone().public_key.as_ref());
 			}
+
+
+			//Check Signatures with public keys
 
 			//TODO: Checks the DID document contains the section `Capability Delegation`
 			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
