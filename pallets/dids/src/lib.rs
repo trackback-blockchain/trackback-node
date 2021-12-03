@@ -85,10 +85,6 @@ pub mod pallet {
 
 	use frame_support::sp_runtime::app_crypto::RuntimePublic;
 	use sp_core::ed25519::Signature as Proof;
-	use frame_support::sp_runtime::app_crypto::ed25519::Public;
-	use sp_runtime::DispatchResult;
-	use crate::Error::DIDProofNotFound;
-	// use sp_application_crypto::ed25519::Signature as Proof;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config + pallet_timestamp::Config {
@@ -255,7 +251,7 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			let _origin_account = ensure_signed(origin)?;
 
-			let mut time = T::TimeProvider::now().as_secs();
+			let time = T::TimeProvider::now().as_secs();
 
 			// TODO:- https://track-back.atlassian.net/browse/TP-258
 			// TODO: Find a better way to do this

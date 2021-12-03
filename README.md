@@ -25,7 +25,7 @@ Blockchain for `Self Sovereign Identity`, `Decentralised Identifiers` and `Verif
 * DID Pallet 
 * Verifiable Credentials Pallet (Q2-2021)
 
-## Stable Version
+### Stabe and compatibel version with [TrackBack-SDKs](https://www.npmjs.com/~trackback)
 * git tag [0.0.7](https://github.com/trackback-blockchain/trackback-node/releases/tag/0.0.7)
 
 ## Important
@@ -34,8 +34,8 @@ Blockchain for `Self Sovereign Identity`, `Decentralised Identifiers` and `Verif
 # Limitations
 * [Limitations](Limitations.md)
 * Releasing as a minimum viable product.
-* Not recommended to use in production.
-* Relesing with limited features (MVP)
+* Not recommended using in production.
+* Releasing with limited features (MVP)
 
 ## Setting up the chain
 * [Install](https://substrate.dev/docs/en/knowledgebase/getting-started/) substrate 
