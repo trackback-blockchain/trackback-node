@@ -356,16 +356,18 @@ fn update_did(
 			did_uri.clone(),
 			did_ref.clone(),
 			public_keys,
-			signature
+			signature.clone()
 		)
 		.ok();
 		assert_ok!(DIDModule::update_did(
 			Origin::signed(1),
+			did_document.as_bytes().to_vec(),
 			did_uri.clone(),
 			did_resolution_metadata,
 			did_document_metadata,
 			None,
-			None
+			None,
+			signature
 		));
 	});
 }
@@ -392,18 +394,20 @@ fn update_non_exsited_did(
 			did_uri.clone(),
 			did_ref,
 			public_keys,
-			signature
+			signature.clone()
 		)
 		.ok();
 
 		assert_err!(
 			DIDModule::update_did(
 				Origin::signed(1),
+				did_document.as_bytes().to_vec(),
 				non_existed_did_uri,
 				did_resolution_metadata,
 				did_document_metadata,
 				None,
 				None,
+				signature
 			),
 			DispatchError::Module { index: 1, error: 1, message: Some("DIDDoesNotExists") }
 		);

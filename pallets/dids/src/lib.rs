@@ -85,6 +85,9 @@ pub mod pallet {
 
 	use frame_support::sp_runtime::app_crypto::RuntimePublic;
 	use sp_core::ed25519::Signature as Proof;
+	use frame_support::sp_runtime::app_crypto::ed25519::Public;
+	use sp_runtime::DispatchResult;
+	use crate::Error::DIDProofNotFound;
 	// use sp_application_crypto::ed25519::Signature as Proof;
 
 	#[pallet::config]
@@ -171,6 +174,9 @@ pub mod pallet {
 
 		/// DID Proof mismatched with the controller
 		DIDProofVerificationFailed,
+
+		/// DID Proof not found or invalid DID URI
+		DIDProofNotFound
 	}
 
 	/// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
@@ -239,26 +245,43 @@ pub mod pallet {
 		#[pallet::weight(0)]
 		pub fn update_did(
 			origin: OriginFor<T>,
+			did_document: Vec<u8>,
 			did_uri: Vec<u8>,
 			did_resolution_metadata: Option<Vec<u8>>,
 			did_document_metadata: Option<Vec<u8>>,
 			did_ref: Option<Vec<u8>>,
 			public_keys: Option<Vec<Vec<u8>>>,
+			mut signatures: Vec<DIDSignature>
 		) -> DispatchResultWithPostInfo {
 			let _origin_account = ensure_signed(origin)?;
 
-			//TODO:  Checks the DID document contains the section `Capability Delegation`
-			// Reference :- https://www.w3.org/TR/did-core/#capability-delegation
+			let mut time = T::TimeProvider::now().as_secs();
 
-			// DIDSignature::<T>::mutate(did_uri.clone(), | did_signature | match did_signature{
-			// 	| None => {
-			// 		let p = 0;
-			// 	},
-			// 	| Some(s) => {
-			//
-			// 		ok(())
-			// 	}
-			// });
+			// TODO:- https://track-back.atlassian.net/browse/TP-258
+			// TODO: Find a better way to do this
+			// Assigning and removing signatures should update this list
+			DIDProof::<T>::remove(did_uri.clone());
+
+			for i in 0..signatures.len() {
+				signatures[i].updated_timestamp = time;
+
+				let proof = signatures[i].clone().proof;
+
+				let public_key = ed25519::Public::try_from(
+					&*(signatures[i].clone().public_key)
+				).unwrap();
+
+				let did_signature: Proof = Proof::from_slice(proof.as_ref());
+				let verified = public_key.verify(&did_document, &did_signature);
+
+				//Check Signatures with public keys
+				if !verified {
+					ensure!(verified, Error::<T>::DIDProofVerificationFailed);
+					break;
+				}
+			}
+
+			DIDProof::<T>::insert(did_uri.clone(), signatures);
 
 			DIDDocument::<T>::mutate(did_uri.clone(), |did| match did {
 				| None => return Err(Error::<T>::DIDDoesNotExists),
@@ -267,7 +290,7 @@ pub mod pallet {
 					d.did_document_metadata = did_document_metadata;
 					d.public_keys = public_keys;
 					d.did_ref = did_ref;
-					d.updated_timestamp = T::TimeProvider::now().as_secs();
+					d.updated_timestamp = time;
 					Ok(())
 				},
 			})?;
@@ -302,12 +325,14 @@ pub mod pallet {
 				signatures[i].updated_timestamp = time.clone();
 
 				let proof = signatures[i].clone().proof;
+
 				let public_key = ed25519::Public::try_from(
 					&*(signatures[i].clone().public_key)
 				).unwrap();
 
 				let did_signature: Proof = Proof::from_slice(proof.as_ref());
-				let verified =public_key.verify(&did_document, &did_signature);
+				let verified = public_key.verify(&did_document, &did_signature);
+
 				//Check Signatures with public keys
 				if !verified {
 					ensure!(verified, Error::<T>::DIDProofVerificationFailed);

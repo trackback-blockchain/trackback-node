@@ -25,6 +25,9 @@ Blockchain for `Self Sovereign Identity`, `Decentralised Identifiers` and `Verif
 * DID Pallet 
 * Verifiable Credentials Pallet (Q2-2021)
 
+## Stable Version
+* git tag [0.0.7](https://github.com/trackback-blockchain/trackback-node/releases/tag/0.0.7)
+
 ## Important
 * Please read [TrackBack DID Readme](pallets/dids/README.md)
 
