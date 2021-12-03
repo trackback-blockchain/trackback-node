@@ -5,13 +5,13 @@
 
 use frame_support::codec::{Decode, Encode};
 use frame_system::Config;
-use sp_std::vec::Vec;
 use sp_core::ed25519::Signature;
+use sp_std::vec::Vec;
 
 /// Stores Signatures by DID Controllers
 /// A DID can have at least a controller
 #[derive(Clone, Decode, Encode, Eq, PartialEq, Debug)]
-pub struct DIDSignature  {
+pub struct DIDSignature {
 	pub public_key: Vec<u8>,
 	pub proof: Signature,
 	pub active: bool,
@@ -77,6 +77,12 @@ impl<T: Config> Default for VerifiableCredential<T> {
 /// Defaults for Signature
 impl Default for DIDSignature {
 	fn default() -> Self {
-		Self { public_key: Vec::new(), proof: Signature::from_raw([0; 64]), active: true, created_time_stamp: 0, updated_timestamp: 0}
+		Self {
+			public_key: Vec::new(),
+			proof: Signature::from_raw([0; 64]),
+			active: true,
+			created_time_stamp: 0,
+			updated_timestamp: 0,
+		}
 	}
 }

@@ -76,12 +76,12 @@ pub mod pallet {
 
 	use frame_system::pallet_prelude::*;
 
-	use crate::structs::{VerifiableCredential, DID, DIDSignature};
+	use crate::structs::{DIDSignature, VerifiableCredential, DID};
 	#[allow(dead_code)]
 	use frame_support::traits::UnixTime;
-	use sp_core::{ed25519};
-	use sp_std::{str, vec::Vec};
+	use sp_core::ed25519;
 	use sp_runtime::sp_std::convert::TryFrom;
+	use sp_std::{str, vec::Vec};
 
 	use frame_support::sp_runtime::app_crypto::RuntimePublic;
 	use sp_core::ed25519::Signature as Proof;
@@ -107,7 +107,8 @@ pub mod pallet {
 	/// This ensures tight bindings with its controller
 	#[pallet::storage]
 	#[pallet::getter(fn get_signature)]
-	pub(super) type DIDProof<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, Vec<DIDSignature>>;
+	pub(super) type DIDProof<T: Config> =
+		StorageMap<_, Blake2_128Concat, Vec<u8>, Vec<DIDSignature>>;
 
 	/// Accounts associated with a DID
 	#[pallet::storage]
@@ -172,7 +173,7 @@ pub mod pallet {
 		DIDProofVerificationFailed,
 
 		/// DID Proof not found or invalid DID URI
-		DIDProofNotFound
+		DIDProofNotFound,
 	}
 
 	/// Offchain worker to support custom RPC calls to assist verifiable credentials with DIDs
@@ -247,7 +248,7 @@ pub mod pallet {
 			did_document_metadata: Option<Vec<u8>>,
 			did_ref: Option<Vec<u8>>,
 			public_keys: Option<Vec<Vec<u8>>>,
-			mut signatures: Vec<DIDSignature>
+			mut signatures: Vec<DIDSignature>,
 		) -> DispatchResultWithPostInfo {
 			let _origin_account = ensure_signed(origin)?;
 
@@ -263,9 +264,8 @@ pub mod pallet {
 
 				let proof = signatures[i].clone().proof;
 
-				let public_key = ed25519::Public::try_from(
-					&*(signatures[i].clone().public_key)
-				).unwrap();
+				let public_key =
+					ed25519::Public::try_from(&*(signatures[i].clone().public_key)).unwrap();
 
 				let did_signature: Proof = Proof::from_slice(proof.as_ref());
 				let verified = public_key.verify(&did_document, &did_signature);
@@ -273,7 +273,7 @@ pub mod pallet {
 				//Check Signatures with public keys
 				if !verified {
 					ensure!(verified, Error::<T>::DIDProofVerificationFailed);
-					break;
+					break
 				}
 			}
 
@@ -306,7 +306,7 @@ pub mod pallet {
 			did_uri: Vec<u8>,
 			did_ref: Option<Vec<u8>>,
 			public_keys: Option<Vec<Vec<u8>>>,
-			mut signatures: Vec<DIDSignature>
+			mut signatures: Vec<DIDSignature>,
 		) -> DispatchResultWithPostInfo {
 			let origin_account = ensure_signed(origin)?;
 
@@ -322,9 +322,8 @@ pub mod pallet {
 
 				let proof = signatures[i].clone().proof;
 
-				let public_key = ed25519::Public::try_from(
-					&*(signatures[i].clone().public_key)
-				).unwrap();
+				let public_key =
+					ed25519::Public::try_from(&*(signatures[i].clone().public_key)).unwrap();
 
 				let did_signature: Proof = Proof::from_slice(proof.as_ref());
 				let verified = public_key.verify(&did_document, &did_signature);
@@ -332,7 +331,7 @@ pub mod pallet {
 				//Check Signatures with public keys
 				if !verified {
 					ensure!(verified, Error::<T>::DIDProofVerificationFailed);
-					break;
+					break
 				}
 			}
 
@@ -357,7 +356,7 @@ pub mod pallet {
 					updated_timestamp: time,
 					did_ref,
 					sender_account_id,
-					public_keys
+					public_keys,
 				},
 			);
 

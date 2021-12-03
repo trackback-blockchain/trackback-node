@@ -4,18 +4,15 @@ use crate::mock::{new_test_ext, Origin};
 
 use rstest::*;
 
-use crate::mock::DIDModule;
+use crate::{mock::DIDModule, structs::DIDSignature};
+use codec::Encode;
 use frame_support::{
-	 assert_ok,assert_err, sp_runtime::app_crypto::sp_core::Hasher, pallet_prelude::DispatchError
+	assert_err, assert_ok,
+	pallet_prelude::DispatchError,
+	sp_runtime::app_crypto::{sp_core::Hasher, Pair},
 };
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
-use sp_core::Blake2Hasher;
-use crate::structs::DIDSignature;
-use sp_core::ed25519::Pair as KeyPair;
-use sp_core::ed25519;
-use codec::Encode;
-use frame_support::sp_runtime::app_crypto::Pair;
-
+use sp_core::{ed25519, ed25519::Pair as KeyPair, Blake2Hasher};
 
 /// Fixture to generate a keypair, secret and a peerId
 #[fixture]
@@ -23,12 +20,10 @@ pub fn key_pair() -> KeyPair {
 	ed25519::Pair::generate().0
 }
 
-
 /// Creates a signature for a DID document
 /// This performs by the Controller or the Issuer
 #[fixture]
-pub fn signature(key_pair: KeyPair,  did_document: &'static str) -> Vec<DIDSignature>{
-
+pub fn signature(key_pair: KeyPair, did_document: &'static str) -> Vec<DIDSignature> {
 	// public key
 	let public_key = key_pair.public();
 
@@ -38,13 +33,13 @@ pub fn signature(key_pair: KeyPair,  did_document: &'static str) -> Vec<DIDSigna
 	// Digital Signature
 	let signed = key_pair.sign(&*did_document.as_bytes().to_vec());
 
-	let mut signatures:Vec<DIDSignature> = Vec::new();
-	signatures.push(	DIDSignature {
+	let mut signatures: Vec<DIDSignature> = Vec::new();
+	signatures.push(DIDSignature {
 		public_key: Vec::from(public_key_to_bytes),
 		proof: signed,
 		active: true,
 		created_time_stamp: 0,
-		updated_timestamp: 0
+		updated_timestamp: 0,
 	});
 
 	signatures
@@ -171,7 +166,7 @@ fn create_did(
 	did_ref: Option<Vec<u8>>,
 	public_key: Vec<u8>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	signature: Vec<DIDSignature>
+	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
 		assert_ok!(DIDModule::insert_did_document(
@@ -202,9 +197,8 @@ fn creates_a_did_with_invalid_signature(
 	did_ref: Option<Vec<u8>>,
 	public_key: Vec<u8>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	mut signature: Vec<DIDSignature>
+	mut signature: Vec<DIDSignature>,
 ) {
-
 	// Signed with a new Keypair
 	let signed = key_pair.sign(&*did_document.as_bytes().to_vec());
 	signature[0].proof = signed;
@@ -212,17 +206,18 @@ fn creates_a_did_with_invalid_signature(
 	new_test_ext().execute_with(|| {
 		assert_err!(
 			DIDModule::insert_did_document(
-			Origin::signed(1),
-			did_document.as_bytes().to_vec(),
-			did_document_metadata,
-			did_resolution_metadata,
-			public_key,
-			did_uri,
-			did_ref,
-			public_keys,
-			signature
-		)
-		,DispatchError::Module { index: 1, error: error_num, message: Some(message) });
+				Origin::signed(1),
+				did_document.as_bytes().to_vec(),
+				did_document_metadata,
+				did_resolution_metadata,
+				public_key,
+				did_uri,
+				did_ref,
+				public_keys,
+				signature
+			),
+			DispatchError::Module { index: 1, error: error_num, message: Some(message) }
+		);
 	});
 }
 
@@ -235,7 +230,7 @@ fn create_an_existing_did(
 	did_ref: Option<Vec<u8>>,
 	public_key: Vec<u8>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	signature: Vec<DIDSignature>
+	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
 		DIDModule::insert_did_document(
@@ -247,8 +242,9 @@ fn create_an_existing_did(
 			did_uri.clone(),
 			did_ref.clone(),
 			public_keys.clone(),
-			signature.clone()
-		).ok();
+			signature.clone(),
+		)
+		.ok();
 
 		assert_err!(
 			DIDModule::insert_did_document(
@@ -276,7 +272,7 @@ fn revoke_a_did(
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	signature: Vec<DIDSignature>
+	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
 		DIDModule::insert_did_document(
@@ -288,7 +284,7 @@ fn revoke_a_did(
 			did_uri.clone(),
 			did_ref,
 			public_keys,
-			signature
+			signature,
 		)
 		.ok();
 
@@ -305,7 +301,7 @@ fn revoke_non_existing_did(
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	signature: Vec<DIDSignature>
+	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
 		DIDModule::insert_did_document(
@@ -317,7 +313,7 @@ fn revoke_non_existing_did(
 			did_uri.clone(),
 			did_ref,
 			public_keys,
-			signature
+			signature,
 		)
 		.ok();
 
@@ -344,7 +340,7 @@ fn update_did(
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	signature: Vec<DIDSignature>
+	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
 		DIDModule::insert_did_document(
@@ -356,7 +352,7 @@ fn update_did(
 			did_uri.clone(),
 			did_ref.clone(),
 			public_keys,
-			signature.clone()
+			signature.clone(),
 		)
 		.ok();
 		assert_ok!(DIDModule::update_did(
@@ -381,7 +377,7 @@ fn update_non_exsited_did(
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_keys: Option<Vec<Vec<u8>>>,
-	signature: Vec<DIDSignature>
+	signature: Vec<DIDSignature>,
 ) {
 	let non_existed_did_uri = Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
 	new_test_ext().execute_with(|| {
@@ -394,7 +390,7 @@ fn update_non_exsited_did(
 			did_uri.clone(),
 			did_ref,
 			public_keys,
-			signature.clone()
+			signature.clone(),
 		)
 		.ok();
 
