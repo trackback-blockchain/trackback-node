@@ -1,16 +1,17 @@
 [package]
 name = "pallet-dids"
-authors = ["Gayan <gayan@track-back.co>"]
+authors = ["Gayan Kalanamith <gayan@track-back.co>"]
 edition = "2018"
 version = '0.0.1'
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = {version = "0.4.19", default-featues = false}
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
 frame-support = { version = '3.0', default-features = false }
 frame-system = { version = '3.0', default-features = false }
+sp-application-crypto = { version = '3.0', default-features = false}
+sp-core = { version = '3.0', default-features = false}
 sp-runtime = { version = '3.0', default-features = false }
 sp-std = { version = '3.0', default-features = false }
 log = { version = "0.4.14", default-features = false }
@@ -30,11 +31,10 @@ doctest = false
 [features]
 default = ['std']
 std = [
-	'chrono/std',
     'codec/std',
 	'frame-support/std',
 	'frame-system/std',
 	'sp-runtime/std',
 	'pallet-timestamp/std',
-	'log/std',
+	'log/std'
 ]
