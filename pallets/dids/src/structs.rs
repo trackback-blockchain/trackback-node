@@ -7,7 +7,7 @@ use frame_support::codec::{Decode, Encode};
 use frame_system::Config;
 use sp_core::ed25519::Signature;
 use sp_std::vec::Vec;
-
+use serde::{Deserialize, Serialize};
 /// Stores Signatures by DID Controllers
 /// A DID can have at least a controller
 #[derive(Clone, Decode, Encode, Eq, PartialEq, Debug)]
@@ -28,7 +28,8 @@ pub struct DIDDetail<T: Config> {
 	did_documents: Vec<DID<T>>,
 }
 
-#[derive(Clone, Decode, Encode, Eq, PartialEq, Debug)]
+#[derive(Clone, Decode, Encode, Eq, PartialEq)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct DID<T: Config> {
 	pub did_resolution_metadata: Option<Vec<u8>>,
 
@@ -53,6 +54,7 @@ pub struct DID<T: Config> {
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct VerifiableCredential<T: Config> {
 	// Controller's AccountId
 	pub account_id: Option<T::AccountId>,
@@ -83,6 +85,22 @@ impl Default for DIDSignature {
 			active: true,
 			created_time_stamp: 0,
 			updated_timestamp: 0,
+		}
+	}
+}
+
+// Defaults for DIDs
+impl <T: Config> Default for DID<T> {
+	fn default() -> Self {
+		Self{
+			did_resolution_metadata: None,
+			did_document_metadata: None,
+			block_number: <T as frame_system::Config>::BlockNumber::default(),
+			block_time_stamp: 0,
+			updated_timestamp: 0,
+			did_ref: None,
+			sender_account_id: vec![],
+			public_keys: None
 		}
 	}
 }
