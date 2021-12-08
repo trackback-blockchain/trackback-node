@@ -7,8 +7,6 @@ use trackback_node_runtime::{
 	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, NodeAuthorizationConfig,
 	Signature, SudoConfig, SystemConfig, WASM_BINARY,
 };
-use trackback_node_runtime::pallet_dids::Error::VerifiableCredentialExists;
-use trackback_node_runtime::pallet_dids::VC;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";

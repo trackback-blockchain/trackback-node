@@ -8,6 +8,8 @@ use frame_system::Config;
 use sp_core::ed25519::Signature;
 use sp_std::vec::Vec;
 use serde::{Deserialize, Serialize};
+
+
 /// Stores Signatures by DID Controllers
 /// A DID can have at least a controller
 #[derive(Clone, Decode, Encode, Eq, PartialEq, Debug)]
@@ -20,24 +22,22 @@ pub struct DIDSignature {
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-pub struct DIDDetail<T: Config> {
+pub struct DIDDetail {
 	// Tracking number of issued DIDs  by the controller
 	public_key: Vec<u8>,
 
 	// Issued DID documents by the controller
-	did_documents: Vec<DID<T>>,
+	did_documents: Vec<DID>,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct DID<T: Config> {
+pub struct DID{
 	pub did_resolution_metadata: Option<Vec<u8>>,
 
 	// DID Document Metadata
 	pub did_document_metadata: Option<Vec<u8>>,
 
-	// Block number
-	pub block_number: <T as frame_system::Config>::BlockNumber,
 	// Created  time stamp in ISO 8601 format
 	pub block_time_stamp: u64,
 
@@ -50,7 +50,7 @@ pub struct DID<T: Config> {
 	pub sender_account_id: Vec<u8>,
 
 	// public keys
-	pub public_keys: Option<Vec<Vec<u8>>>,
+	// pub public_keys: Option<Vec<Vec<u8>>>,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
@@ -68,6 +68,7 @@ pub struct VerifiableCredential<T: Config> {
 	// active
 	pub active: Option<bool>,
 }
+
 
 /// Defaults for VerifiableCredentials
 impl<T: Config> Default for VerifiableCredential<T> {
@@ -90,17 +91,37 @@ impl Default for DIDSignature {
 }
 
 // Defaults for DIDs
-impl <T: Config> Default for DID<T> {
+impl Default for DID {
 	fn default() -> Self {
 		Self{
 			did_resolution_metadata: None,
 			did_document_metadata: None,
-			block_number: <T as frame_system::Config>::BlockNumber::default(),
 			block_time_stamp: 0,
 			updated_timestamp: 0,
 			did_ref: None,
-			sender_account_id: vec![],
-			public_keys: None
+			sender_account_id: Vec::new(),
 		}
 	}
 }
+
+//
+// #[cfg(feature = "std")]
+// pub fn serialize_number<S, T: Copy + Into<U256> + TryFrom<U256>>(
+// 	val: &T,
+// 	s: S,
+// ) -> Result<S::Ok, S::Error>
+// 	where
+// 		S: serde::Serializer,
+// {
+// 	let u256: U256 = (*val).into();
+// 	serde::Serialize::serialize(&u256, s)
+// }
+//
+// #[cfg(feature = "std")]
+// pub fn deserialize_number<'a, D, T: Copy + Into<U256> + TryFrom<U256>>(d: D) -> Result<T, D::Error>
+// 	where
+// 		D: serde::Deserializer<'a>,
+// {
+// 	let u256: U256 = serde::Deserialize::deserialize(d)?;
+// 	TryFrom::try_from(u256).map_err(|_| serde::de::Error::custom("Try from failed"))
+// }

@@ -79,7 +79,7 @@ pub mod pallet {
 	use crate::structs::{DIDSignature, VerifiableCredential, DID};
 	#[allow(dead_code)]
 	use frame_support::traits::UnixTime;
-	use sp_core::ed25519;
+	use sp_core::{ed25519};
 	use sp_runtime::sp_std::convert::TryFrom;
 	use sp_std::{str, vec::Vec};
 
@@ -101,7 +101,7 @@ pub mod pallet {
 	/// Value -> DID structure
 	#[pallet::storage]
 	#[pallet::getter(fn get_did_document)]
-	pub(super) type DIDDocument<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, DID<T>>;
+	pub(super) type DIDDocument<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, DID>;
 
 	/// Stores Signatures for DIDs
 	/// This ensures tight bindings with its controller
@@ -118,7 +118,7 @@ pub mod pallet {
 		Blake2_128Concat,
 		// public key + Controller Account
 		(Vec<u8>, T::AccountId),
-		Vec<DID<T>>,
+		Vec<DID>,
 	>;
 
 	/// Stores a verifiable credential finger print
@@ -129,23 +129,25 @@ pub mod pallet {
 
 	#[pallet::genesis_config]
 	pub struct GenesisConfig<T: Config> {
-		pub did:  (Vec<u8>, DID<T>),
+		pub did:  (Vec<u8>, DID),
 		pub vc: (Vec<u8>, VerifiableCredential<T>),
 	}
 
 	#[cfg(feature = "std")]
 	impl<T: Config> Default for GenesisConfig<T> {
 		fn default() -> Self {
-			Self { did: (vec![], DID {
+			Self
+			{
+				did: (vec![], DID {
 				did_resolution_metadata: None,
 				did_document_metadata: None,
-				block_number: <T as frame_system::Config>::BlockNumber::default(),
 				block_time_stamp: 0,
 				updated_timestamp: 0,
 				did_ref: None,
 				sender_account_id: vec![],
-				public_keys: None
-			}), vc: Default::default() }
+			}
+				),
+				vc: Default::default() }
 		}
 	}
 
@@ -280,7 +282,6 @@ pub mod pallet {
 			did_resolution_metadata: Option<Vec<u8>>,
 			did_document_metadata: Option<Vec<u8>>,
 			did_ref: Option<Vec<u8>>,
-			public_keys: Option<Vec<Vec<u8>>>,
 			mut signatures: Vec<DIDSignature>,
 		) -> DispatchResultWithPostInfo {
 			let _origin_account = ensure_signed(origin)?;
@@ -317,7 +318,6 @@ pub mod pallet {
 				| Some(d) => {
 					d.did_resolution_metadata = did_resolution_metadata;
 					d.did_document_metadata = did_document_metadata;
-					d.public_keys = public_keys;
 					d.did_ref = did_ref;
 					d.updated_timestamp = time;
 					Ok(())
@@ -338,13 +338,11 @@ pub mod pallet {
 			sender_account_id: Vec<u8>,
 			did_uri: Vec<u8>,
 			did_ref: Option<Vec<u8>>,
-			public_keys: Option<Vec<Vec<u8>>>,
 			mut signatures: Vec<DIDSignature>,
 		) -> DispatchResultWithPostInfo {
 			let origin_account = ensure_signed(origin)?;
 
-			let block_number = <frame_system::Module<T>>::block_number();
-
+			let _block_number = <frame_system::Module<T>>::block_number();
 			let time = T::TimeProvider::now().as_secs();
 
 			ensure!(!DIDDocument::<T>::contains_key(&did_uri), Error::<T>::DIDExists);
@@ -384,12 +382,10 @@ pub mod pallet {
 				DID {
 					did_document_metadata,
 					did_resolution_metadata,
-					block_number,
 					block_time_stamp: time.clone(),
 					updated_timestamp: time,
 					did_ref,
 					sender_account_id,
-					public_keys,
 				},
 			);
 
