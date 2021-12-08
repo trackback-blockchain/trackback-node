@@ -79,7 +79,7 @@ pub mod pallet {
 	use crate::structs::{DIDSignature, VerifiableCredential, DID};
 	#[allow(dead_code)]
 	use frame_support::traits::UnixTime;
-	use sp_core::{ed25519};
+	use sp_core::ed25519;
 	use sp_runtime::sp_std::convert::TryFrom;
 	use sp_std::{str, vec::Vec};
 
@@ -124,37 +124,37 @@ pub mod pallet {
 	/// Stores a verifiable credential finger print
 	#[pallet::storage]
 	#[pallet::getter(fn get_verifiable_credential_hash)]
-	pub type VC<T: Config> =
-		StorageMap<_, Blake2_128Concat, Vec<u8>, VerifiableCredential<T>>;
+	pub type VC<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, VerifiableCredential<T>>;
 
 	#[pallet::genesis_config]
 	pub struct GenesisConfig<T: Config> {
-		pub did:  (Vec<u8>, DID),
+		pub did: (Vec<u8>, DID),
 		pub vc: (Vec<u8>, VerifiableCredential<T>),
 	}
 
 	#[cfg(feature = "std")]
 	impl<T: Config> Default for GenesisConfig<T> {
 		fn default() -> Self {
-			Self
-			{
-				did: (vec![], DID {
-				did_resolution_metadata: None,
-				did_document_metadata: None,
-				block_time_stamp: 0,
-				updated_timestamp: 0,
-				did_ref: None,
-				sender_account_id: vec![],
-			}
+			Self {
+				did: (
+					vec![],
+					DID {
+						did_resolution_metadata: None,
+						did_document_metadata: None,
+						block_time_stamp: 0,
+						updated_timestamp: 0,
+						did_ref: None,
+						sender_account_id: vec![],
+					},
 				),
-				vc: Default::default() }
+				vc: Default::default(),
+			}
 		}
 	}
 
 	#[pallet::genesis_build]
 	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
-		fn build(&self)
-		{
+		fn build(&self) {
 			let (a, b) = &self.vc;
 			let (x, y) = &self.did;
 			<DIDDocument<T>>::insert(x, y);

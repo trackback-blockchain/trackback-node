@@ -5,10 +5,9 @@
 
 use frame_support::codec::{Decode, Encode};
 use frame_system::Config;
+use serde::{Deserialize, Serialize};
 use sp_core::ed25519::Signature;
 use sp_std::vec::Vec;
-use serde::{Deserialize, Serialize};
-
 
 /// Stores Signatures by DID Controllers
 /// A DID can have at least a controller
@@ -32,7 +31,7 @@ pub struct DIDDetail {
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct DID{
+pub struct DID {
 	pub did_resolution_metadata: Option<Vec<u8>>,
 
 	// DID Document Metadata
@@ -48,9 +47,8 @@ pub struct DID{
 
 	// Sender AccountId
 	pub sender_account_id: Vec<u8>,
-
-	// public keys
-	// pub public_keys: Option<Vec<Vec<u8>>>,
+	/* public keys
+	 * pub public_keys: Option<Vec<Vec<u8>>>, */
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
@@ -68,7 +66,6 @@ pub struct VerifiableCredential<T: Config> {
 	// active
 	pub active: Option<bool>,
 }
-
 
 /// Defaults for VerifiableCredentials
 impl<T: Config> Default for VerifiableCredential<T> {
@@ -93,7 +90,7 @@ impl Default for DIDSignature {
 // Defaults for DIDs
 impl Default for DID {
 	fn default() -> Self {
-		Self{
+		Self {
 			did_resolution_metadata: None,
 			did_document_metadata: None,
 			block_time_stamp: 0,
@@ -118,8 +115,8 @@ impl Default for DID {
 // }
 //
 // #[cfg(feature = "std")]
-// pub fn deserialize_number<'a, D, T: Copy + Into<U256> + TryFrom<U256>>(d: D) -> Result<T, D::Error>
-// 	where
+// pub fn deserialize_number<'a, D, T: Copy + Into<U256> + TryFrom<U256>>(d: D) -> Result<T,
+// D::Error> 	where
 // 		D: serde::Deserializer<'a>,
 // {
 // 	let u256: U256 = serde::Deserialize::deserialize(d)?;
