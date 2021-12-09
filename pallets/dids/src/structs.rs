@@ -47,8 +47,6 @@ pub struct DID {
 
 	// Sender AccountId
 	pub sender_account_id: Vec<u8>,
-	/* public keys
-	 * pub public_keys: Option<Vec<Vec<u8>>>, */
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]

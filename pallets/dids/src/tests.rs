@@ -24,7 +24,6 @@ pub fn key_pair() -> KeyPair {
 /// This performs by the Controller or the Issuer
 #[fixture]
 pub fn signature(key_pair: KeyPair, did_document: &'static str) -> Vec<DIDSignature> {
-	// let k = ed25519::Pair::from_seed("Alice".as_bytes().to_vec());
 	// public key
 	let public_key = key_pair.public();
 
