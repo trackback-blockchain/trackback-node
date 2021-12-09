@@ -100,25 +100,3 @@ impl Default for DID {
 		}
 	}
 }
-
-//
-// #[cfg(feature = "std")]
-// pub fn serialize_number<S, T: Copy + Into<U256> + TryFrom<U256>>(
-// 	val: &T,
-// 	s: S,
-// ) -> Result<S::Ok, S::Error>
-// 	where
-// 		S: serde::Serializer,
-// {
-// 	let u256: U256 = (*val).into();
-// 	serde::Serialize::serialize(&u256, s)
-// }
-//
-// #[cfg(feature = "std")]
-// pub fn deserialize_number<'a, D, T: Copy + Into<U256> + TryFrom<U256>>(d: D) -> Result<T,
-// D::Error> 	where
-// 		D: serde::Deserializer<'a>,
-// {
-// 	let u256: U256 = serde::Deserialize::deserialize(d)?;
-// 	TryFrom::try_from(u256).map_err(|_| serde::de::Error::custom("Try from failed"))
-// }
