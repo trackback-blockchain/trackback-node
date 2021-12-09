@@ -165,7 +165,6 @@ fn create_did(
 	did_uri: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_key: Vec<u8>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
@@ -177,7 +176,6 @@ fn create_did(
 			public_key,
 			did_uri,
 			did_ref,
-			public_keys,
 			signature
 		));
 	});
@@ -196,7 +194,6 @@ fn creates_a_did_with_invalid_signature(
 	did_uri: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_key: Vec<u8>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	mut signature: Vec<DIDSignature>,
 ) {
 	// Signed with a new Keypair
@@ -213,7 +210,6 @@ fn creates_a_did_with_invalid_signature(
 				public_key,
 				did_uri,
 				did_ref,
-				public_keys,
 				signature
 			),
 			DispatchError::Module { index: 1, error: error_num, message: Some(message) }
@@ -229,7 +225,6 @@ fn create_an_existing_did(
 	did_uri: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
 	public_key: Vec<u8>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
@@ -241,7 +236,6 @@ fn create_an_existing_did(
 			public_key.clone(),
 			did_uri.clone(),
 			did_ref.clone(),
-			public_keys.clone(),
 			signature.clone(),
 		)
 		.ok();
@@ -255,7 +249,6 @@ fn create_an_existing_did(
 				public_key,
 				did_uri.clone(),
 				did_ref,
-				public_keys,
 				signature
 			),
 			DispatchError::Module { index: 1, error: 0, message: Some("DIDExists") }
@@ -271,7 +264,6 @@ fn revoke_a_did(
 	did_uri: Vec<u8>,
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
@@ -283,7 +275,6 @@ fn revoke_a_did(
 			public_key,
 			did_uri.clone(),
 			did_ref,
-			public_keys,
 			signature,
 		)
 		.ok();
@@ -300,7 +291,6 @@ fn revoke_non_existing_did(
 	did_uri: Vec<u8>,
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
@@ -312,7 +302,6 @@ fn revoke_non_existing_did(
 			public_key,
 			did_uri.clone(),
 			did_ref,
-			public_keys,
 			signature,
 		)
 		.ok();
@@ -339,7 +328,6 @@ fn update_did(
 	did_uri: Vec<u8>,
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	signature: Vec<DIDSignature>,
 ) {
 	new_test_ext().execute_with(|| {
@@ -351,7 +339,6 @@ fn update_did(
 			public_key,
 			did_uri.clone(),
 			did_ref.clone(),
-			public_keys,
 			signature.clone(),
 		)
 		.ok();
@@ -361,7 +348,6 @@ fn update_did(
 			did_uri.clone(),
 			did_resolution_metadata,
 			did_document_metadata,
-			None,
 			None,
 			signature
 		));
@@ -376,7 +362,6 @@ fn update_non_exsited_did(
 	did_uri: Vec<u8>,
 	public_key: Vec<u8>,
 	did_ref: Option<Vec<u8>>,
-	public_keys: Option<Vec<Vec<u8>>>,
 	signature: Vec<DIDSignature>,
 ) {
 	let non_existed_did_uri = Blake2Hasher::hash("non_existed".as_ref()).as_bytes().to_vec();
@@ -389,7 +374,6 @@ fn update_non_exsited_did(
 			public_key,
 			did_uri.clone(),
 			did_ref,
-			public_keys,
 			signature.clone(),
 		)
 		.ok();
@@ -401,7 +385,6 @@ fn update_non_exsited_did(
 				non_existed_did_uri,
 				did_resolution_metadata,
 				did_document_metadata,
-				None,
 				None,
 				signature
 			),

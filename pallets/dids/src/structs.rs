@@ -5,6 +5,7 @@
 
 use frame_support::codec::{Decode, Encode};
 use frame_system::Config;
+use serde::{Deserialize, Serialize};
 use sp_core::ed25519::Signature;
 use sp_std::vec::Vec;
 
@@ -20,23 +21,22 @@ pub struct DIDSignature {
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
-pub struct DIDDetail<T: Config> {
+pub struct DIDDetail {
 	// Tracking number of issued DIDs  by the controller
 	public_key: Vec<u8>,
 
 	// Issued DID documents by the controller
-	did_documents: Vec<DID<T>>,
+	did_documents: Vec<DID>,
 }
 
-#[derive(Clone, Decode, Encode, Eq, PartialEq, Debug)]
-pub struct DID<T: Config> {
+#[derive(Clone, Decode, Encode, Eq, PartialEq)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+pub struct DID {
 	pub did_resolution_metadata: Option<Vec<u8>>,
 
 	// DID Document Metadata
 	pub did_document_metadata: Option<Vec<u8>>,
 
-	// Block number
-	pub block_number: <T as frame_system::Config>::BlockNumber,
 	// Created  time stamp in ISO 8601 format
 	pub block_time_stamp: u64,
 
@@ -47,12 +47,10 @@ pub struct DID<T: Config> {
 
 	// Sender AccountId
 	pub sender_account_id: Vec<u8>,
-
-	// public keys
-	pub public_keys: Option<Vec<Vec<u8>>>,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct VerifiableCredential<T: Config> {
 	// Controller's AccountId
 	pub account_id: Option<T::AccountId>,
@@ -83,6 +81,20 @@ impl Default for DIDSignature {
 			active: true,
 			created_time_stamp: 0,
 			updated_timestamp: 0,
+		}
+	}
+}
+
+// Defaults for DIDs
+impl Default for DID {
+	fn default() -> Self {
+		Self {
+			did_resolution_metadata: None,
+			did_document_metadata: None,
+			block_time_stamp: 0,
+			updated_timestamp: 0,
+			did_ref: None,
+			sender_account_id: Vec::new(),
 		}
 	}
 }
