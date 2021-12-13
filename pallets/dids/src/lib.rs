@@ -2,7 +2,6 @@
 // See file LICENSE.md or go to https://www.gnu.org/licenses/gpl-3.0.en.html for full license details.
 //! TrackBack limited
 //! Decentralised Identifiers Pallet Implementation TrackBack Limited
-//! Features in v0.0.1
 //! * Creates a decentralised identifier
 //! * Revokes a decentralised identifier
 //! * Checks an existence of a decentralised identifier
