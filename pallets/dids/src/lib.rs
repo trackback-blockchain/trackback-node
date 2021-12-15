@@ -141,7 +141,7 @@ pub mod pallet {
 						did_resolution_metadata: None,
 						did_document_metadata: None,
 						block_time_stamp: 0,
-						updated_timestamp: 0,
+						updated_time_stamp: 0,
 						did_ref: None,
 						sender_account_id: vec![],
 					},
@@ -318,7 +318,7 @@ pub mod pallet {
 					d.did_resolution_metadata = did_resolution_metadata;
 					d.did_document_metadata = did_document_metadata;
 					d.did_ref = did_ref;
-					d.updated_timestamp = time;
+					d.updated_time_stamp = time;
 					Ok(())
 				},
 			})?;
@@ -382,7 +382,7 @@ pub mod pallet {
 					did_document_metadata,
 					did_resolution_metadata,
 					block_time_stamp: time.clone(),
-					updated_timestamp: time,
+					updated_time_stamp: time,
 					did_ref,
 					sender_account_id,
 				},
