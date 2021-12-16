@@ -293,7 +293,7 @@ pub mod pallet {
 			DIDProof::<T>::remove(did_uri.clone());
 
 			for i in 0..signatures.len() {
-				signatures[i].updated_timestamp = time;
+				signatures[i].updated_time_stamp = time;
 
 				let proof = signatures[i].clone().proof;
 
@@ -348,7 +348,7 @@ pub mod pallet {
 
 			for i in 0..signatures.len() {
 				signatures[i].created_time_stamp = time.clone();
-				signatures[i].updated_timestamp = time.clone();
+				signatures[i].updated_time_stamp = time.clone();
 
 				let proof = signatures[i].clone().proof;
 

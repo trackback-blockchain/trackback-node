@@ -13,6 +13,6 @@
       pub proof: Signature,
       pub active: bool,
       pub created_time_stamp: u64,
-      pub updated_timestamp: u64,
+      pub updated_time_stamp: u64,
   }
   ```

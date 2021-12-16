@@ -17,7 +17,7 @@ pub struct DIDSignature {
 	pub proof: Signature,
 	pub active: bool,
 	pub created_time_stamp: u64,
-	pub updated_timestamp: u64,
+	pub updated_time_stamp: u64,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
@@ -80,7 +80,7 @@ impl Default for DIDSignature {
 			proof: Signature::from_raw([0; 64]),
 			active: true,
 			created_time_stamp: 0,
-			updated_timestamp: 0,
+			updated_time_stamp: 0,
 		}
 	}
 }
