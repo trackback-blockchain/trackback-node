@@ -50,12 +50,12 @@ pub fn new_partial(
 	ServiceError,
 > {
 	if config.keystore_remote.is_some() {
-		return Err(ServiceError::Other(format!("Remote Keystores are not supported.")))
+		return Err(ServiceError::Other("Remote Keystores are not supported.".to_string()))
 	}
 	let inherent_data_providers = sp_inherents::InherentDataProviders::new();
 
 	let (client, backend, keystore_container, task_manager) =
-		sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
+		sc_service::new_full_parts::<Block, RuntimeApi, Executor>(config)?;
 	let client = Arc::new(client);
 
 	let select_chain = sc_consensus::LongestChain::new(backend.clone());
@@ -82,7 +82,7 @@ pub fn new_partial(
 	let import_queue = sc_consensus_aura::import_queue::<_, _, _, AuraPair, _, _>(
 		sc_consensus_aura::slot_duration(&*client)?,
 		aura_block_import.clone(),
-		Some(Box::new(grandpa_block_import.clone())),
+		Some(Box::new(grandpa_block_import)),
 		client.clone(),
 		inherent_data_providers.clone(),
 		&task_manager.spawn_handle(),
@@ -211,7 +211,7 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 			block_import,
 			proposer,
 			network.clone(),
-			inherent_data_providers.clone(),
+			inherent_data_providers,
 			force_authoring,
 			backoff_authoring_blocks,
 			keystore_container.sync_keystore(),
@@ -287,7 +287,7 @@ pub fn new_light(mut config: Configuration) -> Result<TaskManager, ServiceError>
 	let (grandpa_block_import, _) = sc_finality_grandpa::block_import(
 		client.clone(),
 		&(client.clone() as Arc<_>),
-		select_chain.clone(),
+		select_chain,
 	)?;
 
 	let aura_block_import = sc_consensus_aura::AuraBlockImport::<_, _, _, AuraPair>::new(

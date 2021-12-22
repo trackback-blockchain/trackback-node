@@ -17,7 +17,7 @@ pub struct DIDSignature {
 	pub proof: Signature,
 	pub active: bool,
 	pub created_time_stamp: u64,
-	pub updated_timestamp: u64,
+	pub updated_time_stamp: u64,
 }
 
 #[derive(Clone, Decode, Encode, Eq, PartialEq)]
@@ -41,7 +41,7 @@ pub struct DID {
 	pub block_time_stamp: u64,
 
 	// Updated timestamp
-	pub updated_timestamp: u64,
+	pub updated_time_stamp: u64,
 	// IPFS  URI of the DID document
 	pub did_ref: Option<Vec<u8>>,
 
@@ -80,7 +80,7 @@ impl Default for DIDSignature {
 			proof: Signature::from_raw([0; 64]),
 			active: true,
 			created_time_stamp: 0,
-			updated_timestamp: 0,
+			updated_time_stamp: 0,
 		}
 	}
 }
@@ -92,7 +92,7 @@ impl Default for DID {
 			did_resolution_metadata: None,
 			did_document_metadata: None,
 			block_time_stamp: 0,
-			updated_timestamp: 0,
+			updated_time_stamp: 0,
 			did_ref: None,
 			sender_account_id: Vec::new(),
 		}

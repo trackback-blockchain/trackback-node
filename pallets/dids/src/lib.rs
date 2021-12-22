@@ -2,7 +2,6 @@
 // See file LICENSE.md or go to https://www.gnu.org/licenses/gpl-3.0.en.html for full license details.
 //! TrackBack limited
 //! Decentralised Identifiers Pallet Implementation TrackBack Limited
-//! Features in v0.0.1
 //! * Creates a decentralised identifier
 //! * Revokes a decentralised identifier
 //! * Checks an existence of a decentralised identifier
@@ -142,7 +141,7 @@ pub mod pallet {
 						did_resolution_metadata: None,
 						did_document_metadata: None,
 						block_time_stamp: 0,
-						updated_timestamp: 0,
+						updated_time_stamp: 0,
 						did_ref: None,
 						sender_account_id: vec![],
 					},
@@ -294,7 +293,7 @@ pub mod pallet {
 			DIDProof::<T>::remove(did_uri.clone());
 
 			for i in 0..signatures.len() {
-				signatures[i].updated_timestamp = time;
+				signatures[i].updated_time_stamp = time;
 
 				let proof = signatures[i].clone().proof;
 
@@ -319,7 +318,7 @@ pub mod pallet {
 					d.did_resolution_metadata = did_resolution_metadata;
 					d.did_document_metadata = did_document_metadata;
 					d.did_ref = did_ref;
-					d.updated_timestamp = time;
+					d.updated_time_stamp = time;
 					Ok(())
 				},
 			})?;
@@ -349,7 +348,7 @@ pub mod pallet {
 
 			for i in 0..signatures.len() {
 				signatures[i].created_time_stamp = time.clone();
-				signatures[i].updated_timestamp = time.clone();
+				signatures[i].updated_time_stamp = time.clone();
 
 				let proof = signatures[i].clone().proof;
 
@@ -383,7 +382,7 @@ pub mod pallet {
 					did_document_metadata,
 					did_resolution_metadata,
 					block_time_stamp: time.clone(),
-					updated_timestamp: time,
+					updated_time_stamp: time,
 					did_ref,
 					sender_account_id,
 				},

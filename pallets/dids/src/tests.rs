@@ -39,7 +39,7 @@ pub fn signature(key_pair: KeyPair, did_document: &'static str) -> Vec<DIDSignat
 		proof: signed,
 		active: true,
 		created_time_stamp: 0,
-		updated_timestamp: 0,
+		updated_time_stamp: 0,
 	});
 
 	signatures
